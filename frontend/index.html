@@ -26,6 +26,27 @@
     
     <canvas id="gameCanvas"></canvas>
     
+    <!-- Event Chat Modal -->
+    <div id="eventChatModal" class="chat-modal hidden">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h3>Game Master</h3>
+                <button id="closeChatBtn" class="close-btn">×</button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be added here dynamically -->
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="¿Qué haces?" maxlength="200">
+                <button id="sendChatBtn">Enviar</button>
+            </div>
+            <div class="chat-loading hidden" id="chatLoading">
+                <div class="loading-spinner"></div>
+                <span>Evaluando tu acción...</span>
+            </div>
+        </div>
+    </div>
+    
     <div class="medieval-border top"></div>
     <div class="medieval-border bottom"></div>
     <div class="medieval-border left"></div>

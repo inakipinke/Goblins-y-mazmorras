@@ -35,6 +35,7 @@ class HexGame {
         this.initializeGame();
         
         this.setupEventListeners();
+        this.setupChatEventListeners();
         this.gameLoop();
     }
 
@@ -583,7 +584,275 @@ class HexGame {
         const eventConfig = this.getEventConfig(tile.event.type);
         if (eventConfig) {
             console.log(eventConfig.message);
+            // Open chat modal for interactive events
+            this.openEventChat(tile.event);
         }
+    }
+
+    // Open event chat modal
+    openEventChat(event) {
+        const modal = document.getElementById('eventChatModal');
+        const messagesContainer = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendChatBtn');
+        const loadingDiv = document.getElementById('chatLoading');
+        
+        // Clear previous messages
+        messagesContainer.innerHTML = '';
+        chatInput.value = '';
+        loadingDiv.classList.add('hidden');
+        
+        // Store current event
+        this.currentEvent = event;
+        
+        // Show modal
+        modal.classList.remove('hidden');
+        
+        // Generate initial event description using AI
+        this.generateEventDescription(event);
+        
+        // Focus input
+        setTimeout(() => chatInput.focus(), 100);
+    }
+
+    // Generate initial event description using AI
+    async generateEventDescription(event) {
+        const loadingDiv = document.getElementById('chatLoading');
+        const messagesContainer = document.getElementById('chatMessages');
+        
+        try {
+            loadingDiv.classList.remove('hidden');
+            
+            // Get player stats (mock for now - should come from backend)
+            const playerStats = {
+                strength: 5,
+                charisma: 4,
+                agility: 7
+            };
+            
+            // Create event context for AI
+            const eventContext = {
+                type: event.type,
+                description: this.getEventDescription(event.type)
+            };
+            
+            // Call AI for initial description
+            const description = await this.callAI('first-contact', {
+                EVENT: eventContext,
+                BASE_STATS: playerStats
+            });
+            
+            // Add GM message
+            this.addChatMessage('gm', description);
+            
+        } catch (error) {
+            console.error('Error generating event description:', error);
+            // Fallback description
+            const fallback = this.getFallbackDescription(event.type);
+            this.addChatMessage('gm', fallback);
+        } finally {
+            loadingDiv.classList.add('hidden');
+        }
+    }
+
+    // Get event description based on type
+    getEventDescription(eventType) {
+        const descriptions = {
+            'Combate': 'Una criatura hostil bloquea tu camino, gruñendo amenazadoramente.',
+            'Jefe': 'Un poderoso enemigo se alza ante ti, irradiando poder y peligro.',
+            'Encuentro': 'Te encuentras con alguien que necesita tu ayuda o decisión.',
+            'Trampa': 'El suelo cruje bajo tus pies y notas algo extraño en el ambiente.',
+            'Comerciante': 'Un mercader te ofrece sus mercancías con una sonrisa astuta.',
+            'Objeto misterioso': 'Un objeto extraño emana energía mágica impredecible.',
+            'Santuario': 'Un lugar sagrado ofrece descanso y bendiciones.',
+            'Entrenamiento': 'Una oportunidad de mejorar tus habilidades se presenta.',
+            'Exploración': 'Ruinas antiguas guardan secretos esperando ser descubiertos.',
+            'Social': 'Una situación social requiere tu carisma y presencia.'
+        };
+        return descriptions[eventType] || 'Algo interesante sucede aquí.';
+    }
+
+    // Fallback descriptions if AI fails
+    getFallbackDescription(eventType) {
+        const fallbacks = {
+            'Combate': 'Una bestia salvaje emerge gruñendo.\n\nSus ojos brillan con hambre y agresión.\n\nPodrías enfrentarla directamente, esquivarla con agilidad, o intentar calmarla de alguna manera.',
+            'Jefe': 'Un enemigo formidable bloquea tu paso.\n\nSu presencia es intimidante y poderosa.\n\nPodrías desafiarlo con fuerza, usar tu agilidad para encontrar una ventaja, o emplear tu carisma para evitar el conflicto.',
+            'Encuentro': 'Alguien necesita tu ayuda.\n\nLa situación requiere una decisión cuidadosa.\n\nPodrías actuar con determinación, proceder con cautela, o usar tu carisma para resolver la situación.',
+            'Trampa': 'Notas algo sospechoso en el suelo.\n\nEl aire se siente pesado y peligroso.\n\nPodrías avanzar con fuerza, moverte con cuidado, o buscar otra forma de proceder.',
+            'Comerciante': 'Un mercader te ofrece sus productos.\n\nSus precios parecen negociables.\n\nPodrías intimidarlo para mejores precios, regatear hábilmente, o intentar robarle.',
+            'Objeto misterioso': 'Una energía extraña llena el aire.\n\nAlgo mágico está sucediendo aquí.\n\nPodrías investigar con determinación, acercarte cautelosamente, o intentar comunicarte con lo desconocido.',
+            'Santuario': 'Un lugar sagrado te recibe.\n\nLa paz y la tranquilidad llenan el ambiente.\n\nPodrías orar con devoción, explorar con respeto, o meditar en silencio.',
+            'Entrenamiento': 'Una oportunidad de mejora se presenta.\n\nPuedes sentir el potencial de crecimiento.\n\nPodrías entrenar con intensidad, practicar con paciencia, o buscar orientación.',
+            'Exploración': 'Ruinas antiguas se extienden ante ti.\n\nSecretos ocultos esperan ser descubiertos.\n\nPodrías explorar agresivamente, investigar cuidadosamente, o buscar pistas con astucia.',
+            'Social': 'Una situación social se desarrolla.\n\nTu presencia y carisma serán clave.\n\nPodrías imponer tu voluntad, negociar diplomáticamente, o usar tu encanto personal.'
+        };
+        return fallbacks[eventType] || 'Algo misterioso sucede en este lugar.\n\nDebes decidir cómo proceder.\n\nPodrías actuar con fuerza, agilidad, o carisma.';
+    }
+
+    // Add message to chat
+    addChatMessage(type, content) {
+        const messagesContainer = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+        messageDiv.textContent = content;
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Handle player message
+    async handlePlayerMessage(message) {
+        if (!message.trim() || !this.currentEvent) return;
+        
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendChatBtn');
+        const loadingDiv = document.getElementById('chatLoading');
+        
+        // Disable input
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+        loadingDiv.classList.remove('hidden');
+        
+        // Add player message
+        this.addChatMessage('player', message);
+        
+        try {
+            // Get player stats (mock for now)
+            const playerStats = {
+                strength: 5,
+                charisma: 4,
+                agility: 7
+            };
+            
+            // Create event requirements (mock for now)
+            const eventRequirements = {
+                strength: 6,
+                charisma: 5,
+                agility: 8
+            };
+            
+            // Call AI for evaluation
+            const result = await this.callAI('answer-evaluation', {
+                EVENT_CONTEXT: this.getEventDescription(this.currentEvent.type),
+                PLAYER_BASE_STATS: playerStats,
+                EVENT_REQUIREMENTS: eventRequirements,
+                PLAYER_MESSAGE: message
+            });
+            
+            // Process result
+            this.processEventResult(result);
+            
+        } catch (error) {
+            console.error('Error evaluating player action:', error);
+            // Fallback result
+            this.addChatMessage('result', 'Algo salió mal al evaluar tu acción. Inténtalo de nuevo.');
+        } finally {
+            loadingDiv.classList.add('hidden');
+            chatInput.disabled = false;
+            sendBtn.disabled = false;
+            chatInput.value = '';
+            chatInput.focus();
+        }
+    }
+
+    // Process event result
+    processEventResult(result) {
+        if (result.passed) {
+            const successMsg = `¡Éxito! ${result.notes || 'Has superado el desafío.'}`;
+            this.addChatMessage('result', successMsg);
+            console.log(`✅ Event passed using ${result.best_path}`);
+        } else {
+            const failMsg = `Fallaste. ${result.notes || 'No lograste superar el desafío.'}`;
+            this.addChatMessage('result', failMsg);
+            console.log(`❌ Event failed. Missing points: ${JSON.stringify(result.missing_points)}`);
+        }
+        
+        // Close modal after showing result
+        setTimeout(() => {
+            this.closeEventChat();
+        }, 3000);
+    }
+
+    // Mock AI call (replace with actual API call)
+    async callAI(promptType, data) {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+        
+        if (promptType === 'first-contact') {
+            // Return mock description
+            return this.getFallbackDescription(data.EVENT.type);
+        } else if (promptType === 'answer-evaluation') {
+            // Return mock evaluation
+            return {
+                quality: 4,
+                coherence: 5,
+                roleplay_alignment: 4,
+                toxicity: 1,
+                bonus_strength: Math.random() > 0.5 ? 2 : 0,
+                bonus_charisma: Math.random() > 0.5 ? 1 : 0,
+                bonus_agility: Math.random() > 0.5 ? 1 : 0,
+                effective_strength: data.PLAYER_BASE_STATS.strength + 2,
+                effective_charisma: data.PLAYER_BASE_STATS.charisma + 1,
+                effective_agility: data.PLAYER_BASE_STATS.agility + 1,
+                strength_path_passed: Math.random() > 0.4,
+                charisma_path_passed: Math.random() > 0.6,
+                agility_path_passed: Math.random() > 0.5,
+                passed: Math.random() > 0.3,
+                best_path: ['strength', 'charisma', 'agility'][Math.floor(Math.random() * 3)],
+                missing_points: {
+                    strength: Math.floor(Math.random() * 3),
+                    charisma: Math.floor(Math.random() * 3),
+                    agility: Math.floor(Math.random() * 3)
+                },
+                notes: 'Acción evaluada correctamente.'
+            };
+        }
+    }
+
+    // Close event chat
+    closeEventChat() {
+        const modal = document.getElementById('eventChatModal');
+        modal.classList.add('hidden');
+        this.currentEvent = null;
+    }
+
+    // Setup chat event listeners
+    setupChatEventListeners() {
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendChatBtn');
+        const closeBtn = document.getElementById('closeChatBtn');
+        const modal = document.getElementById('eventChatModal');
+        
+        // Send message on button click
+        sendBtn.addEventListener('click', () => {
+            this.handlePlayerMessage(chatInput.value);
+        });
+        
+        // Send message on Enter key
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.handlePlayerMessage(chatInput.value);
+            }
+        });
+        
+        // Close modal
+        closeBtn.addEventListener('click', () => {
+            this.closeEventChat();
+        });
+        
+        // Close on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.closeEventChat();
+            }
+        });
+        
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                this.closeEventChat();
+            }
+        });
     }
 
     render() {
