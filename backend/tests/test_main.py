@@ -197,6 +197,47 @@ def test_use_consumable_heals_and_spends_item(client: TestClient) -> None:
     assert venda["cantidad"] == 2
 
 
+def test_assign_stat_points_updates_base_and_total_stats(client: TestClient) -> None:
+    client.post("/run/nueva", json={"nombre": "Subidor", "arquetipo": "malo"})
+
+    response = client.post(
+        "/goblin/stats/asignar",
+        json={"stat": "fuerza", "cantidad": 3},
+    )
+
+    assert response.status_code == 200
+    goblin = response.json()["goblin"]
+    assert goblin["stats_base"]["fuerza"] == 18
+    assert goblin["stats_totales"]["fuerza"] == 18
+
+
+def test_assign_life_points_increases_base_max_life_and_current_life(client: TestClient) -> None:
+    client.post("/run/nueva", json={"nombre": "Tanque", "arquetipo": "romantico"})
+    client.post("/goblin/recibir-dano", json={"cantidad": 10})
+
+    response = client.post(
+        "/goblin/stats/asignar",
+        json={"stat": "vida", "cantidad": 7},
+    )
+
+    assert response.status_code == 200
+    goblin = response.json()["goblin"]
+    assert goblin["vida_actual"] == 97
+    assert goblin["vida_max"] == 107
+    assert goblin["vida_max_total"] == 107
+    assert goblin["stats_base"]["vida"] == 107
+    assert goblin["stats_totales"]["vida"] == 107
+
+
+def test_assign_stat_requires_active_run(client: TestClient) -> None:
+    response = client.post(
+        "/goblin/stats/asignar",
+        json={"stat": "carisma", "cantidad": 2},
+    )
+
+    assert response.status_code == 404
+
+
 def test_damage_can_defeat_active_run(client: TestClient) -> None:
     client.post("/run/nueva", json={"nombre": "Golpeado", "arquetipo": "malo"})
 
