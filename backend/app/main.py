@@ -49,8 +49,31 @@ class ItemReferencePayload(EquipPayload):
     pass
 
 
-class LootPayload(ItemReferencePayload):
+class LootPayload(BaseModel):
+    item_id: int | None = None
+    item_code: str | None = None
+    nivel: int | None = Field(default=None, ge=1)
+    zona: str | None = None
     cantidad: int = Field(default=1, ge=1)
+
+    @model_validator(mode="after")
+    def validate_loot_source(self) -> "LootPayload":
+        explicit_item = self.item_id is not None or self.item_code is not None
+        random_item = self.nivel is not None or self.zona is not None
+
+        if explicit_item and random_item:
+            raise ValueError("Envia un item especifico o un nivel/zona para loot aleatorio, no ambas cosas.")
+
+        if not explicit_item and not random_item:
+            raise ValueError("Debes enviar item_id, item_code, nivel o zona.")
+
+        if self.item_id is not None and self.item_code is not None:
+            raise ValueError("Debes enviar solo uno: item_id o item_code.")
+
+        if self.nivel is not None and self.zona is not None:
+            raise ValueError("Debes enviar solo uno: nivel o zona.")
+
+        return self
 
 
 class DamagePayload(BaseModel):
@@ -208,6 +231,8 @@ def loot(payload: LootPayload) -> dict[str, object]:
         return add_loot(
             item_id=payload.item_id,
             item_code=payload.item_code,
+            nivel=payload.nivel,
+            zona=payload.zona.strip() if payload.zona else None,
             cantidad=payload.cantidad,
         )
     except Exception as error:
