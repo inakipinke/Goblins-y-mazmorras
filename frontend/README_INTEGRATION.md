@@ -80,7 +80,7 @@ python -m http.server 8080
 Editar `frontend/config.js`:
 ```javascript
 const CONFIG = {
-    API_BASE_URL: 'http://127.0.0.1:8001', // URL del backend
+    API_BASE_URL: 'http://127.0.0.1:8000', // URL del backend
     USE_REAL_AI: false, // true para IA real
     DEBUG_MODE: true // logs detallados
 };
@@ -130,7 +130,6 @@ const CONFIG = {
 
 ### Inventario y Equipo
 - `POST /inventario/loot` - Agregar items
-- `POST /inventario/usar` - Usar consumibles
 - `GET /equipo` - Items equipados
 
 ## 🤖 Sistema de IA (Preparado)

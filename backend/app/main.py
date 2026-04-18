@@ -30,7 +30,6 @@ from app.db import (
     reset_run,
     start_new_run,
     unequip_item,
-    use_item,
 )
 
 
@@ -261,7 +260,6 @@ def unequip(slot: str) -> dict[str, object]:
 
 @app.post("/inventario/loot")
 def loot(payload: LootPayload) -> dict[str, object]:
-    _validate_item_reference(payload)
     try:
         return add_loot(
             item_id=payload.item_id,
@@ -270,15 +268,6 @@ def loot(payload: LootPayload) -> dict[str, object]:
             zona=payload.zona.strip() if payload.zona else None,
             cantidad=payload.cantidad,
         )
-    except Exception as error:
-        raise _translate_error(error) from error
-
-
-@app.post("/inventario/usar")
-def consume_item(payload: ItemReferencePayload) -> dict[str, object]:
-    _validate_item_reference(payload)
-    try:
-        return use_item(item_id=payload.item_id, item_code=payload.item_code)
     except Exception as error:
         raise _translate_error(error) from error
 

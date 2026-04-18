@@ -1,7 +1,7 @@
 // Configuration for the frontend
 const CONFIG = {
     // API Configuration
-    API_BASE_URL: 'http://127.0.0.1:8001',
+    API_BASE_URL: 'http://127.0.0.1:8000',
     
     // AI Configuration
     USE_REAL_AI: false, // Set to true when integrating with real ChatGPT API

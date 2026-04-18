@@ -84,8 +84,7 @@ def test_can_create_run_and_get_goblin(client: TestClient) -> None:
     }
     assert body["goblin"]["vida_actual"] == 100
     assert body["goblin"]["vida_max"] == 100
-    assert len(body["inventario"]) == 1
-    assert body["inventario"][0]["codigo"] == "venda_sucia"
+    assert body["inventario"] == []
     assert body["equipo"] == []
 
     goblin_response = client.get("/goblin")
@@ -130,6 +129,32 @@ def test_unequip_returns_item_to_inventory(client: TestClient) -> None:
     assert unequip_response.json()["goblin"]["stats_totales"]["destreza"] == 15
 
 
+def test_equip_replaces_existing_item_in_same_slot(client: TestClient) -> None:
+    client.post("/run/nueva", json={"nombre": "Talco", "arquetipo": "romantico"})
+    client.post("/inventario/loot", json={"item_code": "amuleto_humedo", "cantidad": 2})
+
+    first_equip_response = client.post("/equipo/equipar", json={"item_code": "amuleto_humedo"})
+    assert first_equip_response.status_code == 200
+    primer_amuleto = first_equip_response.json()["equipo"][0]
+    assert primer_amuleto["codigo"] == "amuleto_humedo"
+    assert primer_amuleto["slot"] == "amuleto"
+    assert primer_amuleto["bonus_vida"] == 4
+    assert primer_amuleto["bonus_carisma"] == 6
+
+    second_equip_response = client.post("/equipo/equipar", json={"item_code": "amuleto_humedo"})
+
+    assert second_equip_response.status_code == 200
+    segundo_amuleto = second_equip_response.json()["equipo"][0]
+    assert segundo_amuleto["codigo"] == "amuleto_humedo"
+    assert segundo_amuleto["slot"] == "amuleto"
+    assert segundo_amuleto["bonus_vida"] == 4
+    assert segundo_amuleto["bonus_carisma"] == 6
+    amuleto = next(
+        item for item in second_equip_response.json()["inventario"] if item["codigo"] == "amuleto_humedo"
+    )
+    assert amuleto["cantidad"] == 1
+
+
 def test_reset_run_starts_a_fresh_run_with_same_archetype(client: TestClient) -> None:
     client.post("/run/nueva", json={"nombre": "Finito", "arquetipo": "malo"})
     client.post("/goblin/stats/asignar", json={"stat": "fuerza", "cantidad": 4})
@@ -158,9 +183,7 @@ def test_reset_run_starts_a_fresh_run_with_same_archetype(client: TestClient) ->
         "destreza": 12,
     }
     assert reset_response.json()["equipo"] == []
-    assert len(reset_response.json()["inventario"]) == 1
-    assert reset_response.json()["inventario"][0]["codigo"] == "venda_sucia"
-    assert reset_response.json()["inventario"][0]["cantidad"] == 3
+    assert reset_response.json()["inventario"] == []
 
 
 def test_cannot_equip_without_active_run(client: TestClient) -> None:
@@ -174,12 +197,12 @@ def test_loot_adds_items_to_inventory(client: TestClient) -> None:
 
     response = client.post(
         "/inventario/loot",
-        json={"item_code": "venda_sucia", "cantidad": 2},
+        json={"item_code": "espada_oxidada", "cantidad": 2},
     )
 
     assert response.status_code == 200
-    venda = next(item for item in response.json()["inventario"] if item["codigo"] == "venda_sucia")
-    assert venda["cantidad"] == 5
+    espada = next(item for item in response.json()["inventario"] if item["codigo"] == "espada_oxidada")
+    assert espada["cantidad"] == 2
 
 
 def test_random_loot_uses_requested_level(client: TestClient) -> None:
@@ -205,19 +228,6 @@ def test_random_loot_uses_zone_level(client: TestClient) -> None:
 
     assert response.status_code == 200
     assert response.json()["item"]["nivel"] == 3
-
-
-def test_use_consumable_heals_and_spends_item(client: TestClient) -> None:
-    client.post("/run/nueva", json={"nombre": "Curita", "arquetipo": "romantico"})
-    client.post("/goblin/recibir-dano", json={"cantidad": 4})
-
-    response = client.post("/inventario/usar", json={"item_code": "venda_sucia"})
-
-    assert response.status_code == 200
-    assert response.json()["curacion_aplicada"] == 3
-    assert response.json()["goblin"]["vida_actual"] == 99
-    venda = next(item for item in response.json()["inventario"] if item["codigo"] == "venda_sucia")
-    assert venda["cantidad"] == 2
 
 
 def test_assign_stat_points_updates_base_and_total_stats(client: TestClient) -> None:

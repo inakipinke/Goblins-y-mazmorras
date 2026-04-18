@@ -61,35 +61,16 @@ ARCHETYPES = (
     },
 )
 
-EXTRA_ITEMS = (
-    {
-        "codigo": "venda_sucia",
-        "nombre": "Venda Sucia",
-        "descripcion": "Mejor no preguntar de donde salio.",
-        "tipo": "consumible",
-        "slot": None,
-        "nivel": 1,
-        "bonus_vida": 0,
-        "bonus_fuerza": 0,
-        "bonus_carisma": 0,
-        "bonus_destreza": 0,
-        "apilable": 1,
-        "efecto_tipo": "heal",
-        "efecto_valor": 3,
-    },
-)
+EXTRA_ITEMS = ()
 
-STARTER_LOADOUT = (
-    ("venda_sucia", 3),
-)
+STARTER_LOADOUT = ()
 
 ITEM_TYPE_TO_SLOT = {
     "arma": "arma",
     "casco": "casco",
     "pechera": "armadura",
     "calzado": "botas",
-    "amuleto": "accesorio",
-    "consumible": None,
+    "amuleto": "amuleto",
 }
 
 
@@ -909,48 +890,6 @@ def add_loot(
         "message": "Loot agregado correctamente.",
         "item": dict(item),
         "cantidad": cantidad,
-        "inventario": list_inventory(),
-    }
-
-
-def use_item(*, item_id: int | None = None, item_code: str | None = None) -> dict[str, Any]:
-    with get_connection() as connection:
-        goblin = _get_active_goblin(connection)
-        if goblin is None:
-            raise NotFoundError("No hay una run activa. Crea una con POST /run/nueva.")
-
-        item = _get_inventory_item(connection, goblin["id"], item_id=item_id, item_code=item_code)
-        if item is None:
-            raise NotFoundError("El item no existe en el inventario.")
-        if item["tipo"] != "consumible":
-            raise ConflictError("Solo se pueden usar items consumibles.")
-
-        effect_type = item["efecto_tipo"]
-        effect_value = item["efecto_valor"]
-        if effect_type != "heal":
-            raise ConflictError("El item no tiene un efecto usable configurado.")
-
-        vida_max_total = _get_effective_max_life(connection, goblin["id"], goblin["vida_max"])
-        updated_life = min(goblin["vida_actual"] + effect_value, vida_max_total)
-        healed_amount = updated_life - goblin["vida_actual"]
-
-        connection.execute(
-            """
-            UPDATE goblin
-            SET vida_actual = ?
-            WHERE id = ?
-            """,
-            (updated_life, goblin["id"]),
-        )
-        _remove_inventory_quantity(connection, goblin["id"], item["id"], 1)
-        connection.commit()
-
-    return {
-        "message": "Item usado correctamente.",
-        "efecto": effect_type,
-        "valor": effect_value,
-        "curacion_aplicada": healed_amount,
-        "goblin": get_goblin_snapshot(),
         "inventario": list_inventory(),
     }
 

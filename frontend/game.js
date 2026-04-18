@@ -306,10 +306,12 @@ class HexGame {
     async fetchInventory() {
         const inventoryStatus = document.getElementById('inventoryStatus');
         const inventoryList = document.getElementById('inventoryList');
+        const equippedList = document.getElementById('equippedList');
 
         inventoryStatus.textContent = 'Cargando inventario...';
         inventoryStatus.classList.remove('is-error');
         inventoryList.innerHTML = '';
+        equippedList.innerHTML = '';
 
         try {
             const runResponse = await fetch(`${this.apiBaseUrl}/run/actual`);
@@ -323,15 +325,25 @@ class HexGame {
                 throw new Error('No se pudo comprobar la run activa en el backend.');
             }
 
-            const response = await fetch(`${this.apiBaseUrl}/inventario`);
-            const payload = await response.json().catch(() => null);
+            const [inventoryResponse, equipmentResponse] = await Promise.all([
+                fetch(`${this.apiBaseUrl}/inventario`),
+                fetch(`${this.apiBaseUrl}/equipo`)
+            ]);
+            const inventoryPayload = await inventoryResponse.json().catch(() => null);
+            const equipmentPayload = await equipmentResponse.json().catch(() => null);
 
-            if (!response.ok) {
-                const detail = payload && payload.detail ? payload.detail : 'No se pudo cargar el inventario.';
+            if (!inventoryResponse.ok) {
+                const detail = inventoryPayload && inventoryPayload.detail ? inventoryPayload.detail : 'No se pudo cargar el inventario.';
                 throw new Error(detail);
             }
 
-            this.inventoryItems = Array.isArray(payload) ? payload : [];
+            if (!equipmentResponse.ok) {
+                const detail = equipmentPayload && equipmentPayload.detail ? equipmentPayload.detail : 'No se pudo cargar el equipo.';
+                throw new Error(detail);
+            }
+
+            this.inventoryItems = Array.isArray(inventoryPayload) ? inventoryPayload : [];
+            this.renderEquippedItems(Array.isArray(equipmentPayload) ? equipmentPayload : []);
             this.renderInventory(this.inventoryItems);
         } catch (error) {
             const message = error instanceof TypeError
@@ -340,7 +352,48 @@ class HexGame {
             inventoryStatus.textContent = message;
             inventoryStatus.classList.add('is-error');
             inventoryList.innerHTML = '';
+            equippedList.innerHTML = '';
         }
+    }
+
+    renderEquippedItems(items) {
+        const equippedList = document.getElementById('equippedList');
+        equippedList.innerHTML = '';
+
+        if (!items.length) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'equipped-empty';
+            emptyState.textContent = 'No tienes nada equipado.';
+            equippedList.appendChild(emptyState);
+            return;
+        }
+
+        items.forEach((item) => {
+            const card = document.createElement('article');
+            card.className = 'equipped-item';
+
+            const header = document.createElement('div');
+            header.className = 'equipped-item-header';
+
+            const name = document.createElement('div');
+            name.className = 'equipped-item-name';
+            name.textContent = item.nombre;
+
+            const slot = document.createElement('div');
+            slot.className = 'equipped-item-slot';
+            slot.textContent = item.slot || 'sin slot';
+
+            header.appendChild(name);
+            header.appendChild(slot);
+
+            const stats = document.createElement('div');
+            stats.className = 'equipped-item-stats';
+            stats.textContent = `HP ${item.bonus_vida || 0} | STR ${item.bonus_fuerza || 0} | CAR ${item.bonus_carisma || 0} | DEX ${item.bonus_destreza || 0}`;
+
+            card.appendChild(header);
+            card.appendChild(stats);
+            equippedList.appendChild(card);
+        });
     }
 
     renderInventory(items) {
@@ -401,8 +454,46 @@ class HexGame {
                 card.appendChild(effect);
             }
 
+            if (item.slot) {
+                const actions = document.createElement('div');
+                actions.className = 'inventory-item-actions';
+
+                const equipButton = document.createElement('button');
+                equipButton.type = 'button';
+                equipButton.className = 'inventory-equip-btn';
+                equipButton.textContent = 'Equipar';
+                equipButton.addEventListener('click', async () => {
+                    await this.equipInventoryItem(item);
+                });
+
+                actions.appendChild(equipButton);
+                card.appendChild(actions);
+            }
+
             inventoryList.appendChild(card);
         });
+    }
+
+    async equipInventoryItem(item) {
+        const inventoryStatus = document.getElementById('inventoryStatus');
+
+        try {
+            inventoryStatus.textContent = `Equipando ${item.nombre}...`;
+            inventoryStatus.classList.remove('is-error');
+
+            await this.apiCall('/equipo/equipar', {
+                method: 'POST',
+                body: JSON.stringify({ item_id: item.id })
+            });
+
+            await this.fetchInventory();
+            await this.updatePlayerStats();
+            inventoryStatus.textContent = `${item.nombre} equipado correctamente.`;
+        } catch (error) {
+            inventoryStatus.textContent = error.message || `No se pudo equipar ${item.nombre}.`;
+            inventoryStatus.classList.add('is-error');
+            console.error('Failed to equip inventory item:', error);
+        }
     }
 
 
@@ -1031,13 +1122,12 @@ class HexGame {
             
             // Add loot
             if (effects.equipment && effects.equipment > 0) {
-                const items = ['garrote_astillado', 'rosa_robada', 'botas_chispeantes', 'chaleco_remendado'];
-                const randomItem = items[Math.floor(Math.random() * items.length)];
+                const zona = this.getZoneForCurrentPosition();
                 await this.apiCall('/inventario/loot', {
                     method: 'POST',
-                    body: JSON.stringify({ item_code: randomItem, cantidad: effects.equipment })
+                    body: JSON.stringify({ zona, cantidad: effects.equipment })
                 });
-                console.log(`🎁 Found item: ${randomItem}!`);
+                console.log(`🎁 Found ${effects.equipment} item(s) from zone ${zona}!`);
                 statsUpdated = true;
             }
             
@@ -1073,6 +1163,9 @@ class HexGame {
             // Update stats display if anything changed
             if (statsUpdated) {
                 await this.updatePlayerStats();
+                await this.fetchInventory().catch((error) => {
+                    console.warn('Failed to refresh inventory after event effects:', error);
+                });
             }
             
         } catch (error) {
@@ -2030,7 +2123,7 @@ class HexGame {
         console.log('🧪 Testing item pickup...');
         try {
             // Simulate finding a random item
-            const items = ['espada_oxidada', 'capucha_ladron', 'botas_cuero', 'amuleto_humedo'];
+            const items = ['espada_oxidada', 'capucha_de_ladron', 'botas_de_cuero', 'amuleto_humedo'];
             const randomItem = items[Math.floor(Math.random() * items.length)];
             
             await this.apiCall('/inventario/loot', {
