@@ -1,0 +1,129 @@
+{
+  "eventTypes": [
+    {
+      "type": "Combate",
+      "description": "Eventos centrados en enfrentar enemigos o superar una amenaza directa por la fuerza, la agilidad o la presencia. Suelen tener riesgo alto y recompensas de oro, equipo o puntos de habilidad.",
+      "includes": [
+        "peleas contra enemigos comunes",
+        "emboscadas",
+        "bandas hostiles",
+        "manadas o criaturas agresivas",
+        "duelos normales",
+        "asaltos a guaridas o fortalezas menores"
+      ]
+    },
+    {
+      "type": "Jefe",
+      "description": "Eventos de combate o desafío mayor contra enemigos únicos, campeones, criaturas legendarias o pruebas de máximo nivel. Tienen dificultad muy alta y recompensas superiores al resto.",
+      "includes": [
+        "campeones de arena o torneo",
+        "criaturas legendarias",
+        "guardianes antiguos",
+        "duelos contra figuras importantes",
+        "colosos, titanes o jefes de zona",
+        "pruebas finales de fuerza, destreza o carisma"
+      ]
+    },
+    {
+      "type": "Encuentro",
+      "description": "Eventos donde interactúas con personajes, criaturas o grupos que no son necesariamente enemigos directos. Pueden resolverse ayudando, negociando, calmando o tomando una decisión.",
+      "includes": [
+        "personajes perdidos o heridos",
+        "nobles, mensajeros o guardias",
+        "bestias que pueden ser calmadas",
+        "mercenarios o cazadores",
+        "rituales o entidades con las que se puede interactuar",
+        "situaciones con varias salidas no puramente combativas"
+      ]
+    },
+    {
+      "type": "Trampa",
+      "description": "Eventos donde el principal peligro es el entorno, una emboscada inesperada, un mecanismo oculto o una situación de alto riesgo físico. Suelen castigar con daño o pérdida de equipo.",
+      "includes": [
+        "puentes rotos o inestables",
+        "trampas mecánicas o explosivas",
+        "pantanos, lagunas tóxicas o niebla peligrosa",
+        "emboscadas repentinas",
+        "zonas de derrumbe",
+        "pasajes peligrosos o caminos mortales"
+      ]
+    },
+    {
+      "type": "Comerciante",
+      "description": "Eventos relacionados con compra, venta, trueque, regateo o acceso a objetos mediante intercambio. A veces incluyen opciones de robo o intimidación, pero su núcleo es económico.",
+      "includes": [
+        "vendedores ambulantes",
+        "mercados negros",
+        "mercaderes de reliquias",
+        "comerciantes raros o sospechosos",
+        "puestos de compra de equipo",
+        "intercambios de oro por equipamiento"
+      ]
+    },
+    {
+      "type": "Objeto misterioso",
+      "description": "Eventos centrados en cofres, fuentes, pozos, portales, lagos, anillos de hongos u otros elementos extraños del mundo. Suelen otorgar efectos especiales, aleatorios o mágicos.",
+      "includes": [
+        "cofres",
+        "arcones malditos",
+        "pozos",
+        "fuentes mágicas",
+        "portales",
+        "lagos extraños",
+        "círculos o anillos de hongos",
+        "objetos con efectos aleatorios o sobrenaturales"
+      ]
+    },
+    {
+      "type": "Santuario",
+      "description": "Eventos de bendición, curación o mejora espiritual. Normalmente dan beneficios relativamente seguros, como vida, carisma o puntos de habilidad.",
+      "includes": [
+        "altares",
+        "iglesias",
+        "templos",
+        "capillas",
+        "santuarios",
+        "lugares sagrados o de oración"
+      ]
+    },
+    {
+      "type": "Entrenamiento",
+      "description": "Eventos donde el personaje mejora sus atributos mediante estudio, práctica, disciplina o preparación física. Suelen aumentar stats de forma directa.",
+      "includes": [
+        "escuelas",
+        "academias",
+        "gimnasios",
+        "forjas de entrenamiento",
+        "maestros de disciplina",
+        "lugares diseñados para mejorar STR, DEX o CHAR"
+      ]
+    },
+    {
+      "type": "Exploración",
+      "description": "Eventos centrados en descubrir ruinas, minas, bibliotecas, torres, cavernas o restos antiguos. Generalmente premian con tesoros, conocimiento o reliquias.",
+      "includes": [
+        "ruinas",
+        "bibliotecas",
+        "minas",
+        "torres",
+        "cavernas",
+        "criptas",
+        "caravanas destruidas",
+        "cadáveres de exploradores",
+        "zonas con secretos ocultos"
+      ]
+    },
+    {
+      "type": "Social",
+      "description": "Eventos donde la interacción humana o la imagen del personaje son la clave. Suelen involucrar persuasión, carisma, reputación, apuestas, enseñanza o vínculos sociales.",
+      "includes": [
+        "monjes, sabios o ascetas",
+        "tabernas y salas de apuestas",
+        "campamentos amistosos",
+        "maestros errantes",
+        "personas que enseñan o aconsejan",
+        "situaciones donde el carisma o la conversación son centrales"
+      ]
+    }
+  ]
+}
