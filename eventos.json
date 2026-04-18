@@ -188,7 +188,7 @@
       "failure": { "hp": -20, "dex": -2 }
     },
     {
-      "name": "Espíritu del bosque",
+      "name": "Espíritu del lolo",
       "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Convencer" },
@@ -218,7 +218,7 @@
       "failure": { "hp": -20, "char": -2 }
     },
     {
-      "name": "Torre derrumbada",
+      "name": "Torre usurpada",
       "type": "Exploración",
       "options": [
         { "stat": "DEX", "value": 25, "action": "Escalar" },
@@ -228,7 +228,7 @@
       "failure": { "hp": -15 }
     },
     {
-      "name": "Mensajero perdido",
+      "name": "Mensajero boleado",
       "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 15, "action": "Ayudar" }
@@ -296,7 +296,7 @@
       "failure": { "hp": -20 }
     },
     {
-      "name": "Noble en peligro",
+      "name": "Diputado en peligro",
       "type": "Encuentro",
       "options": [
         { "stat": "STR", "value": 20, "action": "Salvar" },
@@ -388,7 +388,7 @@
       "failure": { "hp": -20, "char": -2 }
     },
     {
-      "name": "Pozo de los deseos",
+      "name": "Pozo de los mirkos",
       "type": "Objeto misterioso",
       "effect": {
         "gold": -10,
@@ -414,7 +414,7 @@
     {
       "name": "Duelo callejero",
       "type": "Combate",
-      "description": "Un fanfarrón te desafía frente a todos.",
+      "description": "Un fanfarrón te desafía frente a todos los lolos.",
       "options": [
         { "stat": "STR", "value": 25, "action": "Aceptar el duelo" },
         { "stat": "DEX", "value": 25, "action": "Burlarlo y esquivar" },
