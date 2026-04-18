@@ -586,6 +586,19 @@ class HexGame {
             this.canvas.style.cursor = 'crosshair';
         });
         
+        // New Run button
+        const newRunBtn = document.getElementById('newRunBtn');
+        if (newRunBtn) {
+            console.log('✅ Nueva Partida button found and event listener attached');
+            newRunBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('🎮 Nueva Partida button clicked!');
+                this.startNewRun();
+            });
+        } else {
+            console.error('❌ Nueva Partida button not found!');
+        }
+        
         // Keyboard shortcuts for camera control
         document.addEventListener('keydown', (e) => {
             const panSpeed = 50;
@@ -819,21 +832,33 @@ class HexGame {
                 statsUpdated = true;
             }
             
-            // Apply stat changes
+            // Apply stat changes using backend endpoint
             if (effects.str || effects.fuerza) {
                 const statChange = effects.str || effects.fuerza;
+                await this.apiCall('/goblin/stats/asignar', {
+                    method: 'POST',
+                    body: JSON.stringify({ stat: 'fuerza', cantidad: statChange })
+                });
                 console.log(`💪 Strength ${statChange > 0 ? '+' : ''}${statChange}`);
                 statsUpdated = true;
             }
             
             if (effects.char || effects.carisma) {
                 const statChange = effects.char || effects.carisma;
+                await this.apiCall('/goblin/stats/asignar', {
+                    method: 'POST',
+                    body: JSON.stringify({ stat: 'carisma', cantidad: statChange })
+                });
                 console.log(`🎭 Charisma ${statChange > 0 ? '+' : ''}${statChange}`);
                 statsUpdated = true;
             }
             
             if (effects.dex || effects.destreza) {
                 const statChange = effects.dex || effects.destreza;
+                await this.apiCall('/goblin/stats/asignar', {
+                    method: 'POST',
+                    body: JSON.stringify({ stat: 'destreza', cantidad: statChange })
+                });
                 console.log(`🏃 Agility ${statChange > 0 ? '+' : ''}${statChange}`);
                 statsUpdated = true;
             }
@@ -1453,6 +1478,38 @@ class HexGame {
         }, 3000);
     }
 
+    // Show error notification
+    showErrorNotification(message) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.95), rgba(192, 57, 43, 0.95));
+            border: 2px solid #e74c3c;
+            border-radius: 10px;
+            padding: 15px 20px;
+            color: white;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            max-width: 300px;
+            text-align: center;
+        `;
+        
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 5000);
+    }
+
     // Show bonus popup after player action
     showBonusPopup(result) {
         const bonuses = [];
@@ -1545,6 +1602,111 @@ class HexGame {
                 }, 300);
             }
         }, 3000);
+    }
+
+    // Start a new run
+    async startNewRun() {
+        const newRunBtn = document.getElementById('newRunBtn');
+        if (newRunBtn) {
+            newRunBtn.disabled = true;
+            newRunBtn.textContent = 'Creando...';
+        }
+        
+        try {
+            console.log('🎮 Starting new run...');
+            
+            // Check if there's an active run first
+            let hasActiveRun = false;
+            try {
+                await this.apiCall('/run/actual');
+                hasActiveRun = true;
+                console.log('Active run found, resetting...');
+            } catch (error) {
+                console.log('No active run found, creating new one...');
+            }
+            
+            // Only reset if there's an active run
+            if (hasActiveRun) {
+                await this.apiCall('/run/reset', {
+                    method: 'POST'
+                });
+            }
+            
+            // Create new run with random archetype
+            const arquetipos = ['romantico', 'malo', 'rayo_mcqueen'];
+            const randomArchetype = arquetipos[Math.floor(Math.random() * arquetipos.length)];
+            
+            await this.apiCall('/run/nueva', {
+                method: 'POST',
+                body: JSON.stringify({
+                    nombre: 'Goblin Aventurero',
+                    arquetipo: randomArchetype
+                })
+            });
+            
+            console.log(`✅ New run created with archetype: ${randomArchetype}`);
+            
+            // Reinitialize the game
+            await this.reinitializeGame();
+            
+        } catch (error) {
+            console.error('Failed to start new run:', error);
+            // Show user-friendly error message
+            this.showErrorNotification('Error al crear nueva partida. Verifica que el backend esté funcionando.');
+        } finally {
+            if (newRunBtn) {
+                newRunBtn.disabled = false;
+                newRunBtn.textContent = 'Nueva Partida';
+            }
+        }
+    }
+
+    // Reinitialize game after new run
+    async reinitializeGame() {
+        // Reset game state
+        this.currentEvent = null;
+        this.currentEventData = null;
+        this.tileStates.clear();
+        
+        // Choose new random starting position
+        const outerBorderHexes = this.hexMap.filter(hex => {
+            const distance = Math.max(Math.abs(hex.q), Math.abs(hex.r), Math.abs(-hex.q - hex.r));
+            return distance === this.maxRadius;
+        });
+        
+        const randomStart = outerBorderHexes[Math.floor(Math.random() * outerBorderHexes.length)];
+        this.goblin.q = randomStart.q;
+        this.goblin.r = randomStart.r;
+        
+        // Center camera on new goblin position
+        this.centerCameraOnGoblin();
+        
+        // Initialize all tiles as hidden with new random events
+        this.hexMap.forEach(hex => {
+            const key = `${hex.q},${hex.r}`;
+            this.tileStates.set(key, {
+                state: 'hidden',
+                event: this.generateRandomEvent(),
+                coordinates: { q: hex.q, r: hex.r },
+                hasWall: false,
+                hasDoor: false
+            });
+        });
+        
+        // Setup new walls and doors
+        this.setupWallsAndDoors();
+        
+        // Set starting tile as visited
+        const startKey = `${this.goblin.q},${this.goblin.r}`;
+        this.tileStates.get(startKey).state = 'visited';
+        
+        // Reveal adjacent tiles
+        this.revealAdjacentTiles(this.goblin.q, this.goblin.r);
+        
+        // Update player stats
+        await this.updatePlayerStats();
+        
+        console.log(`🎮 Game reinitialized! New spawn: (${this.goblin.q}, ${this.goblin.r})`);
     }
 
     // Setup chat event listeners
