@@ -1,6 +1,8 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel, Field, model_validator
 
 from app.db import (
@@ -70,10 +72,31 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(
     title="Goblins y Mazmorras API",
-    version="0.2.0",
+    version="0.2.1",  # Incremented to force reload
     description="Backend del goblin roguelike con inventario, equipo y runs.",
     lifespan=lifespan,
 )
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,  # Set to False when using allow_origins=["*"]
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
+
+# Handle preflight OPTIONS requests
+@app.options("/{path:path}")
+async def options_handler(path: str):
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        }
+    )
 
 
 def _translate_error(error: Exception) -> HTTPException:

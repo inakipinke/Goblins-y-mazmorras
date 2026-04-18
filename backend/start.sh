@@ -3,9 +3,23 @@
 set -e
 
 INSTALL=false
-if [[ "$1" == "--install" ]]; then
-    INSTALL=true
-fi
+PORT=8000
+
+# Parse arguments
+for arg in "$@"; do
+    case $arg in
+        --install)
+            INSTALL=true
+            shift
+            ;;
+        --port=*)
+            PORT="${arg#*=}"
+            shift
+            ;;
+        *)
+            ;;
+    esac
+done
 
 BACKEND_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_PATH="$BACKEND_ROOT/.venv"
@@ -43,5 +57,5 @@ if [[ "$INSTALL" == true ]]; then
 fi
 
 cd "$BACKEND_ROOT"
-echo "Levantando backend en http://127.0.0.1:8000"
-"$VENV_PYTHON" -m uvicorn app.main:app --reload
+echo "Levantando backend en http://127.0.0.1:$PORT"
+"$VENV_PYTHON" -m uvicorn app.main:app --reload --port "$PORT"

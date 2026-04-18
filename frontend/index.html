@@ -21,6 +21,32 @@
                 <div class="panel-title">Quest Log</div>
                 <div class="quest-text">Find the doors to breach the fortified walls</div>
             </div>
+            
+            <div class="stats-panel">
+                <div class="panel-title">Goblin Stats</div>
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <span class="stat-icon">💪</span>
+                        <span class="stat-label">Fuerza:</span>
+                        <span class="stat-value" id="statFuerza">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">🗣️</span>
+                        <span class="stat-label">Carisma:</span>
+                        <span class="stat-value" id="statCarisma">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">⚡</span>
+                        <span class="stat-label">Destreza:</span>
+                        <span class="stat-value" id="statDestreza">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">❤️</span>
+                        <span class="stat-label">HP:</span>
+                        <span class="stat-value" id="statHP">-</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -32,6 +58,63 @@
             <div class="chat-header">
                 <h3>Game Master</h3>
                 <button id="closeChatBtn" class="close-btn">×</button>
+            </div>
+            <div class="event-stats-panel" id="eventStatsPanel">
+                <div class="goblin-stats">
+                    <h4>Goblin Stats</h4>
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <span class="stat-icon">💪</span>
+                            <span class="stat-label">Fuerza:</span>
+                            <span class="stat-value" id="goblinStrength">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">💬</span>
+                            <span class="stat-label">Carisma:</span>
+                            <span class="stat-value" id="goblinCharisma">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">⚡</span>
+                            <span class="stat-label">Destreza:</span>
+                            <span class="stat-value" id="goblinAgility">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="event-requirements" id="eventRequirements">
+                    <h4>Requirements</h4>
+                    <div class="requirement-bars">
+                        <div class="requirement-bar" id="strengthReq">
+                            <div class="req-label">
+                                <span class="req-icon">💪</span>
+                                <span class="req-text">Fuerza</span>
+                                <span class="req-value">0/0</span>
+                            </div>
+                            <div class="req-progress">
+                                <div class="req-fill"></div>
+                            </div>
+                        </div>
+                        <div class="requirement-bar" id="charismaReq">
+                            <div class="req-label">
+                                <span class="req-icon">💬</span>
+                                <span class="req-text">Carisma</span>
+                                <span class="req-value">0/0</span>
+                            </div>
+                            <div class="req-progress">
+                                <div class="req-fill"></div>
+                            </div>
+                        </div>
+                        <div class="requirement-bar" id="agilityReq">
+                            <div class="req-label">
+                                <span class="req-icon">⚡</span>
+                                <span class="req-text">Destreza</span>
+                                <span class="req-value">0/0</span>
+                            </div>
+                            <div class="req-progress">
+                                <div class="req-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="chat-messages" id="chatMessages">
                 <!-- Messages will be added here dynamically -->

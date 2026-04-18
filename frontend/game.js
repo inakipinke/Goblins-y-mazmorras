@@ -8,6 +8,7 @@ class HexGame {
         this.maxRadius = this.ringWidths.reduce((sum, width) => sum + width, 0) - 1;
         this.hexSize = 30; // Fixed hex size for consistent zoom
         this.apiBaseUrl = CONFIG.API_BASE_URL;
+        this.playerStats = { fuerza: 0, carisma: 0, destreza: 0, hp: 0 };
         this.eventCatalog = [
             { type: 'Combate', icon: '⚔️', color: '#e74c3c', probability: 0.16, message: '⚔️ Enemies close in. Time for a fight.' },
             { type: 'Jefe', icon: '👑', color: '#c0392b', probability: 0.05, message: '👑 A mighty boss blocks your path.' },
@@ -35,6 +36,11 @@ class HexGame {
         };
         
         this.goblin = { q: 0, r: 0 };
+        
+        // Show default stats immediately
+        this.playerStats = { fuerza: 8, carisma: 12, destreza: 10, hp: 100 };
+        this.showInitialStats();
+        
         this.initializeGame();
         
         this.setupEventListeners();
@@ -81,17 +87,49 @@ class HexGame {
         // Initialize backend run if needed
         await this.ensureActiveRun();
         
+        // Load and display player stats
+        await this.updatePlayerStats();
+        
         console.log(`🎮 Game Started! Goblin spawned at border position (${this.goblin.q}, ${this.goblin.r}).`);
+    }
+
+    // Show stats immediately when DOM is ready
+    showInitialStats() {
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.displayPlayerStats();
+            });
+        } else {
+            this.displayPlayerStats();
+        }
     }
 
     async ensureActiveRun() {
         try {
-            // Check if there's an active run
-            await this.apiCall('/run/actual');
-            console.log('✅ Active run found');
+            // Always reset run on page refresh (F5)
+            console.log('🔄 Resetting run on page refresh...');
+            await this.apiCall('/run/reset', {
+                method: 'POST'
+            });
+            console.log('✅ Run reset successfully');
+            
+            // Create new run
+            const arquetipos = ['romantico', 'malo', 'rayo_mcqueen'];
+            const randomArchetype = arquetipos[Math.floor(Math.random() * arquetipos.length)];
+            
+            await this.apiCall('/run/nueva', {
+                method: 'POST',
+                body: JSON.stringify({
+                    nombre: 'Goblin Aventurero',
+                    arquetipo: randomArchetype
+                })
+            });
+            console.log(`✅ New run created with archetype: ${randomArchetype}`);
+            
         } catch (error) {
-            // No active run, create one
-            console.log('🔄 Creating new run...');
+            console.warn('Failed to reset/create run:', error);
+            // Try to create a new run anyway
             try {
                 const arquetipos = ['romantico', 'malo', 'rayo_mcqueen'];
                 const randomArchetype = arquetipos[Math.floor(Math.random() * arquetipos.length)];
@@ -559,6 +597,9 @@ class HexGame {
                 case 'c': // Center on goblin
                     this.centerCameraOnGoblin();
                     break;
+                case 'i': // Test item pickup (for debugging)
+                    this.testItemPickup();
+                    break;
             }
         });
     }
@@ -616,8 +657,14 @@ class HexGame {
         const eventConfig = this.getEventConfig(tile.event.type);
         if (eventConfig) {
             console.log(eventConfig.message);
-            // Open chat modal for interactive events
-            this.openEventChat(tile.event);
+            
+            // Handle sanctuary events directly without AI
+            if (tile.event.type === 'Santuario') {
+                this.handleSanctuaryEvent(tile.event);
+            } else {
+                // Open chat modal for interactive events
+                this.openEventChat(tile.event);
+            }
         }
     }
 
@@ -646,14 +693,62 @@ class HexGame {
 
     async getGoblinStats() {
         try {
-            return await this.apiCall('/goblin');
+            const response = await this.apiCall('/goblin');
+            console.log('Backend goblin response:', response);
+            return response;
         } catch (error) {
-            console.warn('No active run found, using default stats');
+            console.warn('Backend not available, using default stats');
+            // Return mock data that matches actual backend structure
             return {
                 stats_totales: { fuerza: 8, carisma: 12, destreza: 10 },
-                stats_base: { fuerza: 8, carisma: 12, destreza: 10 }
+                stats_base: { fuerza: 8, carisma: 12, destreza: 10 },
+                vida_actual: 100,
+                vida_max: 100,
+                nombre: 'Goblin Aventurero',
+                arquetipo: 'romantico'
             };
         }
+    }
+
+    async updatePlayerStats() {
+        try {
+            const goblinData = await this.getGoblinStats();
+            
+            // Update internal stats - use stats_totales and vida_actual from backend response
+            this.playerStats = {
+                fuerza: goblinData.stats_totales?.fuerza || 8,
+                carisma: goblinData.stats_totales?.carisma || 12,
+                destreza: goblinData.stats_totales?.destreza || 10,
+                hp: goblinData.vida_actual || 100
+            };
+            
+            console.log('Updated player stats from backend:', this.playerStats);
+            
+            // Update UI
+            this.displayPlayerStats();
+            
+        } catch (error) {
+            console.error('Failed to update player stats:', error);
+            // Use default stats if API fails
+            this.playerStats = { fuerza: 8, carisma: 12, destreza: 10, hp: 100 };
+            this.displayPlayerStats();
+        }
+    }
+
+    displayPlayerStats() {
+        console.log('Displaying player stats:', this.playerStats);
+        
+        const statFuerza = document.getElementById('statFuerza');
+        const statCarisma = document.getElementById('statCarisma');
+        const statDestreza = document.getElementById('statDestreza');
+        const statHP = document.getElementById('statHP');
+        
+        if (statFuerza) statFuerza.textContent = this.playerStats.fuerza;
+        if (statCarisma) statCarisma.textContent = this.playerStats.carisma;
+        if (statDestreza) statDestreza.textContent = this.playerStats.destreza;
+        if (statHP) statHP.textContent = this.playerStats.hp;
+        
+        console.log('Stats updated in UI');
     }
 
     async consumeEvent(zona, tipo) {
@@ -670,57 +765,123 @@ class HexGame {
 
     async applyEventConsequences(result, eventData) {
         try {
-            if (result.passed) {
-                // Apply success consequences
-                if (eventData.success) {
-                    await this.applyEventEffects(eventData.success);
-                }
-            } else {
-                // Apply failure consequences
-                if (eventData.failure) {
-                    await this.applyEventEffects(eventData.failure);
-                }
+            if (result.passed && eventData.success) {
+                console.log('✅ Event succeeded! Applying success rewards...');
+                await this.applyEventEffects(eventData.success);
+            } else if (!result.passed && eventData.failure) {
+                console.log('❌ Event failed! Applying failure consequences...');
+                await this.applyEventEffects(eventData.failure);
             }
         } catch (error) {
             console.error('Failed to apply event consequences:', error);
         }
     }
 
+    // Apply direct event effects (for events without options)
+    async applyDirectEventEffects(evento) {
+        if (!evento.effect) return;
+        
+        try {
+            console.log('🎁 Applying direct event effects:', evento.effect);
+            
+            // Handle random effects
+            if (evento.effect.random) {
+                const randomEffect = evento.effect.random[Math.floor(Math.random() * evento.effect.random.length)];
+                await this.applyEventEffects(randomEffect);
+                return;
+            }
+            
+            // Apply direct effects
+            await this.applyEventEffects(evento.effect);
+            
+        } catch (error) {
+            console.error('Failed to apply direct event effects:', error);
+        }
+    }
+
     async applyEventEffects(effects) {
         try {
+            let statsUpdated = false;
+            
             // Apply damage
             if (effects.hp && effects.hp < 0) {
                 await this.apiCall('/goblin/recibir-dano', {
                     method: 'POST',
                     body: JSON.stringify({ cantidad: Math.abs(effects.hp) })
                 });
+                console.log(`💔 Lost ${Math.abs(effects.hp)} HP`);
+                statsUpdated = true;
             }
             
             // Apply healing
             if (effects.hp && effects.hp > 0) {
-                // Use healing item if available, or just log
-                console.log(`Healed for ${effects.hp} HP`);
+                console.log(`❤️ Healed for ${effects.hp} HP`);
+                statsUpdated = true;
+            }
+            
+            // Apply stat changes
+            if (effects.str || effects.fuerza) {
+                const statChange = effects.str || effects.fuerza;
+                console.log(`💪 Strength ${statChange > 0 ? '+' : ''}${statChange}`);
+                statsUpdated = true;
+            }
+            
+            if (effects.char || effects.carisma) {
+                const statChange = effects.char || effects.carisma;
+                console.log(`🎭 Charisma ${statChange > 0 ? '+' : ''}${statChange}`);
+                statsUpdated = true;
+            }
+            
+            if (effects.dex || effects.destreza) {
+                const statChange = effects.dex || effects.destreza;
+                console.log(`🏃 Agility ${statChange > 0 ? '+' : ''}${statChange}`);
+                statsUpdated = true;
             }
             
             // Add loot
             if (effects.equipment && effects.equipment > 0) {
-                // Add random equipment
                 const items = ['garrote_astillado', 'rosa_robada', 'botas_chispeantes', 'chaleco_remendado'];
                 const randomItem = items[Math.floor(Math.random() * items.length)];
                 await this.apiCall('/inventario/loot', {
                     method: 'POST',
                     body: JSON.stringify({ item_code: randomItem, cantidad: effects.equipment })
                 });
+                console.log(`🎁 Found item: ${randomItem}!`);
+                statsUpdated = true;
+            }
+            
+            // Add specific items
+            if (effects.items && Array.isArray(effects.items)) {
+                for (const item of effects.items) {
+                    console.log(`🎁 Received: ${item}`);
+                }
+                statsUpdated = true;
             }
             
             // Add gold
             if (effects.gold) {
-                console.log(`Gained ${effects.gold} gold`);
+                console.log(`💰 ${effects.gold > 0 ? 'Gained' : 'Lost'} ${Math.abs(effects.gold)} gold`);
             }
             
             // Add skill points
             if (effects.skillPoints) {
-                console.log(`Gained ${effects.skillPoints} skill points`);
+                console.log(`⭐ Gained ${effects.skillPoints} skill points`);
+            }
+            
+            // Handle equipment loss
+            if (effects.loseEquipment) {
+                console.log(`💸 Lost ${effects.loseEquipment} equipment`);
+                statsUpdated = true;
+            }
+            
+            if (effects.loseAllEquipment) {
+                console.log(`💸 Lost all equipment!`);
+                statsUpdated = true;
+            }
+            
+            // Update stats display if anything changed
+            if (statsUpdated) {
+                await this.updatePlayerStats();
             }
             
         } catch (error) {
@@ -748,6 +909,14 @@ class HexGame {
         const zona = this.getZoneForCurrentPosition();
         this.currentEventData = await this.consumeEvent(zona, event.type);
         
+        // Apply event rewards BEFORE opening chat if event has direct effects
+        if (this.currentEventData && this.currentEventData.evento) {
+            await this.applyDirectEventEffects(this.currentEventData.evento);
+        }
+        
+        // Load and display goblin stats in the event modal
+        await this.loadGoblinStatsForEvent();
+        
         // Show modal
         modal.classList.remove('hidden');
         
@@ -756,6 +925,95 @@ class HexGame {
         
         // Focus input
         setTimeout(() => chatInput.focus(), 100);
+    }
+
+    // Load and display goblin stats in event modal
+    async loadGoblinStatsForEvent() {
+        try {
+            const goblinData = await this.getGoblinStats();
+            // Use stats_totales for event modal display
+            const stats = goblinData.stats_totales || {
+                fuerza: 8, carisma: 12, destreza: 10
+            };
+            
+            // Store current stats for calculations
+            this.currentGoblinStats = stats;
+            
+            // Update event modal UI with stats_totales
+            document.getElementById('goblinStrength').textContent = stats.fuerza || 0;
+            document.getElementById('goblinCharisma').textContent = stats.carisma || 0;
+            document.getElementById('goblinAgility').textContent = stats.destreza || 0;
+            
+            // Load and display requirements
+            this.loadEventRequirements();
+            
+        } catch (error) {
+            console.error('Failed to load goblin stats for event:', error);
+            // Use default stats
+            this.currentGoblinStats = { fuerza: 8, carisma: 12, destreza: 10 };
+            document.getElementById('goblinStrength').textContent = '8';
+            document.getElementById('goblinCharisma').textContent = '12';
+            document.getElementById('goblinAgility').textContent = '10';
+            this.loadEventRequirements();
+        }
+    }
+
+    // Load and display event requirements
+    loadEventRequirements() {
+        let requirements = { fuerza: 6, carisma: 5, destreza: 8 };
+        
+        // Extract requirements from backend event data if available
+        if (this.currentEventData && this.currentEventData.evento && this.currentEventData.evento.options) {
+            requirements = this.extractRequirementsFromOptions(this.currentEventData.evento.options);
+        }
+        
+        // Store requirements for later use
+        this.currentRequirements = requirements;
+        
+        // Show requirements panel
+        const requirementsPanel = document.getElementById('eventRequirements');
+        requirementsPanel.classList.remove('hidden');
+        
+        // Update requirement bars
+        this.updateRequirementBar('strengthReq', 'Fuerza', this.currentGoblinStats.fuerza || 0, requirements.fuerza || 0);
+        this.updateRequirementBar('charismaReq', 'Carisma', this.currentGoblinStats.carisma || 0, requirements.carisma || 0);
+        this.updateRequirementBar('agilityReq', 'Destreza', this.currentGoblinStats.destreza || 0, requirements.destreza || 0);
+    }
+
+    // Update individual requirement bar
+    updateRequirementBar(barId, statName, currentValue, requiredValue, bonus = 0) {
+        const bar = document.getElementById(barId);
+        if (!bar) {
+            console.error(`Requirement bar ${barId} not found`);
+            return;
+        }
+        
+        const valueSpan = bar.querySelector('.req-value');
+        const fillDiv = bar.querySelector('.req-fill');
+        
+        if (!valueSpan || !fillDiv) {
+            console.error(`Required elements not found in ${barId}`);
+            return;
+        }
+        
+        const effectiveValue = currentValue + bonus;
+        const percentage = Math.min(100, (effectiveValue / requiredValue) * 100);
+        
+        // Update text
+        valueSpan.textContent = `${effectiveValue}/${requiredValue}`;
+        
+        // Update progress bar
+        fillDiv.style.width = `${percentage}%`;
+        
+        // Update color based on success
+        fillDiv.className = 'req-fill';
+        if (effectiveValue >= requiredValue) {
+            fillDiv.classList.add('success');
+        } else if (effectiveValue >= requiredValue * 0.7) {
+            fillDiv.classList.add('partial');
+        } else {
+            fillDiv.classList.add('failed');
+        }
     }
 
     getZoneForCurrentPosition() {
@@ -869,20 +1127,21 @@ class HexGame {
         try {
             // Get player stats from backend
             const goblinData = await this.getGoblinStats();
+            const baseStats = goblinData.stats_base || goblinData.stats_totales || this.currentGoblinStats;
             
             // Create event requirements based on backend event data
-            let eventRequirements = { fuerza: 6, carisma: 5, destreza: 8 };
-            if (this.currentEventData && this.currentEventData.evento && this.currentEventData.evento.options) {
-                eventRequirements = this.extractRequirementsFromOptions(this.currentEventData.evento.options);
-            }
+            let eventRequirements = this.currentRequirements || { fuerza: 6, carisma: 5, destreza: 8 };
             
             // Call AI for evaluation
             const result = await this.callAI('answer-evaluation', {
                 EVENT_CONTEXT: this.getEventDescription(this.currentEvent.type),
-                PLAYER_BASE_STATS: goblinData.stats_base || goblinData.stats_totales,
+                PLAYER_BASE_STATS: baseStats,
                 EVENT_REQUIREMENTS: eventRequirements,
                 PLAYER_MESSAGE: message
             });
+            
+            // Update requirement bars with bonuses
+            this.updateRequirementBarsWithBonuses(result);
             
             // Apply consequences to backend
             if (this.currentEventData && this.currentEventData.evento) {
@@ -903,6 +1162,41 @@ class HexGame {
             chatInput.value = '';
             chatInput.focus();
         }
+    }
+
+    // Update requirement bars with bonuses from player action
+    updateRequirementBarsWithBonuses(result) {
+        const baseStats = this.currentGoblinStats;
+        const requirements = this.currentRequirements;
+        
+        if (!baseStats || !requirements) {
+            console.error('Missing stats or requirements for bonus calculation');
+            return;
+        }
+        
+        // Update bars with bonuses
+        this.updateRequirementBar('strengthReq', 'Fuerza', 
+            baseStats.fuerza || 0, requirements.fuerza || 0, result.bonus_strength || 0);
+        this.updateRequirementBar('charismaReq', 'Carisma', 
+            baseStats.carisma || 0, requirements.carisma || 0, result.bonus_charisma || 0);
+        this.updateRequirementBar('agilityReq', 'Destreza', 
+            baseStats.destreza || 0, requirements.destreza || 0, result.bonus_agility || 0);
+        
+        // Add visual feedback for successful paths
+        setTimeout(() => {
+            if (result.strength_path_passed) {
+                const strengthReq = document.getElementById('strengthReq');
+                if (strengthReq) strengthReq.style.boxShadow = '0 0 10px rgba(39, 174, 96, 0.6)';
+            }
+            if (result.charisma_path_passed) {
+                const charismaReq = document.getElementById('charismaReq');
+                if (charismaReq) charismaReq.style.boxShadow = '0 0 10px rgba(39, 174, 96, 0.6)';
+            }
+            if (result.agility_path_passed) {
+                const agilityReq = document.getElementById('agilityReq');
+                if (agilityReq) agilityReq.style.boxShadow = '0 0 10px rgba(39, 174, 96, 0.6)';
+            }
+        }, 500);
     }
 
     extractRequirementsFromOptions(options) {
@@ -939,9 +1233,11 @@ class HexGame {
             console.log(`❌ Event failed. Missing points: ${JSON.stringify(result.missing_points)}`);
         }
         
-        // Close modal after showing result
-        setTimeout(() => {
+        // Close modal after showing result and update main page stats
+        setTimeout(async () => {
             this.closeEventChat();
+            // Update main page stats after event completion
+            await this.updatePlayerStats();
         }, 3000);
     }
 
@@ -951,6 +1247,7 @@ class HexGame {
         await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
         
         if (promptType === 'first-contact') {
+            console.log(data, "DATA")
             // Use backend event data if available
             if (data.EVENT.backendData && data.EVENT.backendData.evento) {
                 const evento = data.EVENT.backendData.evento;
@@ -1048,7 +1345,109 @@ class HexGame {
     closeEventChat() {
         const modal = document.getElementById('eventChatModal');
         modal.classList.add('hidden');
+        
+        // Reset requirement bars visual effects
+        const strengthReq = document.getElementById('strengthReq');
+        const charismaReq = document.getElementById('charismaReq');
+        const agilityReq = document.getElementById('agilityReq');
+        
+        if (strengthReq) strengthReq.style.boxShadow = '';
+        if (charismaReq) charismaReq.style.boxShadow = '';
+        if (agilityReq) agilityReq.style.boxShadow = '';
+        
+        // Hide requirements panel
+        const requirementsPanel = document.getElementById('eventRequirements');
+        if (requirementsPanel) requirementsPanel.classList.add('hidden');
+        
         this.currentEvent = null;
+        this.currentEventData = null;
+        this.currentGoblinStats = null;
+        this.currentRequirements = null;
+    }
+
+    // Handle sanctuary events directly without AI
+    async handleSanctuaryEvent(event) {
+        try {
+            // Get event data from backend
+            const zona = this.getZoneForCurrentPosition();
+            const eventData = await this.consumeEvent(zona, event.type);
+            
+            if (eventData && eventData.evento) {
+                const evento = eventData.evento;
+                
+                // Show sanctuary message
+                const sanctuaryMessages = {
+                    'Arbol rejuvenecedor': '🌳 Te acercas al árbol sagrado y sientes una energía curativa fluyendo por tu cuerpo.',
+                    'Altar de los dioses': '⛪ El altar emana poder divino. Sientes tu espíritu fortalecerse.',
+                    'Iglesia de los payenes': '⛪ La iglesia te recibe con calidez. Tu carisma se ve bendecido.',
+                    'Santuario olvidado': '⛪ Este lugar sagrado abandonado aún conserva su poder sanador.'
+                };
+                
+                const message = sanctuaryMessages[evento.nombre] || 
+                    evento.descripcion || 
+                    '⛪ Un lugar sagrado te bendice con su poder.';
+                
+                console.log(message);
+                
+                // Apply sanctuary effects immediately
+                if (evento.effect) {
+                    await this.applyEventEffects(evento.effect);
+                    console.log('✨ Sanctuary effects applied!');
+                }
+                
+                // Show brief notification
+                this.showSanctuaryNotification(message);
+                
+                // Update main page stats after sanctuary effects
+                await this.updatePlayerStats();
+                
+            } else {
+                // Fallback for when backend is not available
+                console.log('⛪ You find peace and restoration in this sacred place.');
+                this.showSanctuaryNotification('⛪ You find peace and restoration in this sacred place.');
+            }
+            
+        } catch (error) {
+            console.error('Error handling sanctuary event:', error);
+            // Fallback
+            console.log('⛪ A sacred place offers you rest and blessing.');
+            this.showSanctuaryNotification('⛪ A sacred place offers you rest and blessing.');
+        }
+    }
+
+    // Show sanctuary notification
+    showSanctuaryNotification(message) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.95), rgba(101, 67, 33, 0.95));
+            border: 3px solid #d4af37;
+            border-radius: 15px;
+            padding: 20px 30px;
+            color: #deb887;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            max-width: 400px;
+            line-height: 1.4;
+        `;
+        
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 3000);
     }
 
     // Setup chat event listeners
@@ -1187,9 +1586,37 @@ class HexGame {
         this.render();
         requestAnimationFrame(() => this.gameLoop());
     }
+    
+    // Test function to simulate item pickup
+    async testItemPickup() {
+        console.log('🧪 Testing item pickup...');
+        try {
+            // Simulate finding a random item
+            const items = ['espada_oxidada', 'capucha_ladron', 'botas_cuero', 'amuleto_humedo'];
+            const randomItem = items[Math.floor(Math.random() * items.length)];
+            
+            await this.apiCall('/inventario/loot', {
+                method: 'POST',
+                body: JSON.stringify({ item_code: randomItem, cantidad: 1 })
+            });
+            
+            console.log(`🎁 Found ${randomItem}! Updating stats...`);
+            await this.updatePlayerStats();
+            
+        } catch (error) {
+            console.log('⚠️ Backend not available, simulating stat increase...');
+            // Simulate stat increase for testing
+            this.playerStats.fuerza += 2;
+            this.playerStats.carisma += 1;
+            this.displayPlayerStats();
+        }
+    }
 }
 
 // Start the game when page loads
 window.addEventListener('load', () => {
-    new HexGame();
+    // Ensure DOM is fully loaded before starting
+    setTimeout(() => {
+        new HexGame();
+    }, 100);
 });
