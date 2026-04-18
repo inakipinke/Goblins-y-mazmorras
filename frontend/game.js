@@ -1174,6 +1174,9 @@ class HexGame {
             return;
         }
         
+        // Show bonus popup if any bonuses were gained
+        this.showBonusPopup(result);
+        
         // Update bars with bonuses
         this.updateRequirementBar('strengthReq', 'Fuerza', 
             baseStats.fuerza || 0, requirements.fuerza || 0, result.bonus_strength || 0);
@@ -1446,6 +1449,100 @@ class HexGame {
         setTimeout(() => {
             if (notification.parentNode) {
                 notification.parentNode.removeChild(notification);
+            }
+        }, 3000);
+    }
+
+    // Show bonus popup after player action
+    showBonusPopup(result) {
+        const bonuses = [];
+        
+        if (result.bonus_strength > 0) {
+            bonuses.push(`💪 Fuerza +${result.bonus_strength}`);
+        }
+        if (result.bonus_charisma > 0) {
+            bonuses.push(`🎭 Carisma +${result.bonus_charisma}`);
+        }
+        if (result.bonus_agility > 0) {
+            bonuses.push(`🏃 Destreza +${result.bonus_agility}`);
+        }
+        
+        if (bonuses.length === 0) {
+            bonuses.push('❌ Sin bonificaciones');
+        }
+        
+        // Create popup element
+        const popup = document.createElement('div');
+        popup.style.cssText = `
+            position: fixed;
+            top: 20%;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.95), rgba(101, 67, 33, 0.95));
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            padding: 15px 20px;
+            color: #deb887;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1500;
+            max-width: 200px;
+            text-align: center;
+            animation: slideInRight 0.3s ease-out;
+        `;
+        
+        // Add title
+        const title = document.createElement('div');
+        title.style.cssText = `
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        `;
+        title.textContent = 'Bonificaciones:';
+        popup.appendChild(title);
+        
+        // Add bonuses
+        bonuses.forEach(bonus => {
+            const bonusDiv = document.createElement('div');
+            bonusDiv.style.cssText = `
+                margin: 4px 0;
+                font-size: 0.85rem;
+                text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+            `;
+            bonusDiv.textContent = bonus;
+            popup.appendChild(bonusDiv);
+        });
+        
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        document.body.appendChild(popup);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            if (popup.parentNode) {
+                popup.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => {
+                    if (popup.parentNode) {
+                        popup.parentNode.removeChild(popup);
+                    }
+                }, 300);
             }
         }, 3000);
     }
