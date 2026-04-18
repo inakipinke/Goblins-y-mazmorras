@@ -55,6 +55,18 @@ def test_lists_zones_and_event_types(client: TestClient) -> None:
     assert "Santuario" in event_types
 
 
+def test_lists_items_seeded_from_items_json(client: TestClient) -> None:
+    response = client.get("/items")
+
+    assert response.status_code == 200
+    items = response.json()
+    espada = next(item for item in items if item["codigo"] == "espada_oxidada")
+    assert espada["tipo"] == "arma"
+    assert espada["nivel"] == 1
+    assert espada["bonus_fuerza"] == 9
+    assert espada["bonus_vida"] == 0
+
+
 def test_can_create_run_and_get_goblin(client: TestClient) -> None:
     create_response = client.post(
         "/run/nueva",
@@ -65,6 +77,7 @@ def test_can_create_run_and_get_goblin(client: TestClient) -> None:
     body = create_response.json()
     assert body["goblin"]["nombre"] == "Berto"
     assert body["goblin"]["stats_base"] == {
+        "vida": 100,
         "fuerza": 8,
         "carisma": 15,
         "destreza": 12,
@@ -78,6 +91,7 @@ def test_can_create_run_and_get_goblin(client: TestClient) -> None:
     goblin_response = client.get("/goblin")
     assert goblin_response.status_code == 200
     assert goblin_response.json()["stats_totales"] == {
+        "vida": 100,
         "fuerza": 8,
         "carisma": 15,
         "destreza": 12,
@@ -86,32 +100,32 @@ def test_can_create_run_and_get_goblin(client: TestClient) -> None:
 
 def test_equip_item_updates_stats_and_inventory(client: TestClient) -> None:
     client.post("/run/nueva", json={"nombre": "Tacho", "arquetipo": "malo"})
-    client.post("/inventario/loot", json={"item_code": "garrote_astillado", "cantidad": 1})
+    client.post("/inventario/loot", json={"item_code": "espada_oxidada", "cantidad": 1})
 
     inventory_response = client.get("/inventario")
-    garrote = next(item for item in inventory_response.json() if item["codigo"] == "garrote_astillado")
+    espada = next(item for item in inventory_response.json() if item["codigo"] == "espada_oxidada")
 
     equip_response = client.post(
         "/equipo/equipar",
-        json={"item_id": garrote["id"]},
+        json={"item_id": espada["id"]},
     )
 
     assert equip_response.status_code == 200
-    assert any(item["codigo"] == "garrote_astillado" for item in equip_response.json()["equipo"])
-    assert all(item["codigo"] != "garrote_astillado" for item in equip_response.json()["inventario"])
-    assert equip_response.json()["goblin"]["stats_totales"]["fuerza"] == 16
+    assert any(item["codigo"] == "espada_oxidada" for item in equip_response.json()["equipo"])
+    assert all(item["codigo"] != "espada_oxidada" for item in equip_response.json()["inventario"])
+    assert equip_response.json()["goblin"]["stats_totales"]["fuerza"] == 24
 
 
 def test_unequip_returns_item_to_inventory(client: TestClient) -> None:
     client.post("/run/nueva", json={"nombre": "Lola", "arquetipo": "rayo_mcqueen"})
-    client.post("/inventario/loot", json={"item_code": "botas_chispeantes", "cantidad": 1})
-    client.post("/equipo/equipar", json={"item_code": "botas_chispeantes"})
+    client.post("/inventario/loot", json={"item_code": "botas_de_cuero", "cantidad": 1})
+    client.post("/equipo/equipar", json={"item_code": "botas_de_cuero"})
 
     unequip_response = client.post("/equipo/desequipar/botas")
 
     assert unequip_response.status_code == 200
     assert unequip_response.json()["equipo"] == []
-    botas = next(item for item in unequip_response.json()["inventario"] if item["codigo"] == "botas_chispeantes")
+    botas = next(item for item in unequip_response.json()["inventario"] if item["codigo"] == "botas_de_cuero")
     assert botas["cantidad"] == 1
     assert unequip_response.json()["goblin"]["stats_totales"]["destreza"] == 15
 
@@ -127,7 +141,7 @@ def test_reset_run_clears_current_state(client: TestClient) -> None:
 
 
 def test_cannot_equip_without_active_run(client: TestClient) -> None:
-    response = client.post("/equipo/equipar", json={"item_code": "garrote_astillado"})
+    response = client.post("/equipo/equipar", json={"item_code": "espada_oxidada"})
 
     assert response.status_code == 404
 
@@ -143,6 +157,31 @@ def test_loot_adds_items_to_inventory(client: TestClient) -> None:
     assert response.status_code == 200
     venda = next(item for item in response.json()["inventario"] if item["codigo"] == "venda_sucia")
     assert venda["cantidad"] == 5
+
+
+def test_random_loot_uses_requested_level(client: TestClient) -> None:
+    client.post("/run/nueva", json={"nombre": "LootNivel", "arquetipo": "malo"})
+
+    response = client.post(
+        "/inventario/loot",
+        json={"nivel": 2, "cantidad": 1},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["item"]["nivel"] == 2
+    assert response.json()["item"]["slot"] is not None
+
+
+def test_random_loot_uses_zone_level(client: TestClient) -> None:
+    client.post("/run/nueva", json={"nombre": "LootZona", "arquetipo": "malo"})
+
+    response = client.post(
+        "/inventario/loot",
+        json={"zona": "castillo", "cantidad": 1},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["item"]["nivel"] == 3
 
 
 def test_use_consumable_heals_and_spends_item(client: TestClient) -> None:
@@ -216,3 +255,24 @@ def test_consume_event_fails_when_zone_type_is_exhausted(client: TestClient) -> 
         assert response.status_code == 200
 
     assert last_status == 409
+
+
+def test_new_run_starts_with_clean_events_after_reset(client: TestClient) -> None:
+    client.post("/run/nueva", json={"nombre": "Primero", "arquetipo": "romantico"})
+    first_event = client.post(
+        "/eventos/consumir",
+        json={"zona": "inicial", "tipo": "Santuario"},
+    ).json()["evento"]["id"]
+
+    reset_response = client.post("/run/reset")
+    assert reset_response.status_code == 200
+
+    second_run = client.post("/run/nueva", json={"nombre": "Segundo", "arquetipo": "romantico"})
+    assert second_run.status_code == 200
+
+    second_event = client.post(
+        "/eventos/consumir",
+        json={"zona": "inicial", "tipo": "Santuario"},
+    ).json()["evento"]["id"]
+
+    assert second_event == first_event

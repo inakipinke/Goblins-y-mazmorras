@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import json
 import os
+import random
+import re
 import sqlite3
+import unicodedata
 from pathlib import Path
 from typing import Any
 
@@ -36,7 +39,7 @@ ARCHETYPES = (
         "codigo": "romantico",
         "nombre": "Goblin Romantico",
         "descripcion": "Tiene mas carisma que verguenza.",
-        "fuerza_base":8,
+        "fuerza_base": 8,
         "carisma_base": 15,
         "destreza_base": 12,
     },
@@ -58,65 +61,15 @@ ARCHETYPES = (
     },
 )
 
-ITEMS = (
-    {
-        "codigo": "garrote_astillado",
-        "nombre": "Garrote Astillado",
-        "descripcion": "No es elegante, pero pega fuerte.",
-        "tipo": "arma",
-        "slot": "arma",
-        "bonus_fuerza": 1,
-        "bonus_carisma": 0,
-        "bonus_destreza": 0,
-        "apilable": 0,
-        "efecto_tipo": None,
-        "efecto_valor": 0,
-    },
-    {
-        "codigo": "rosa_robada",
-        "nombre": "Rosa Robada",
-        "descripcion": "Le da un encanto dudoso al portador.",
-        "tipo": "accesorio",
-        "slot": "accesorio",
-        "bonus_fuerza": 0,
-        "bonus_carisma": 1,
-        "bonus_destreza": 0,
-        "apilable": 0,
-        "efecto_tipo": None,
-        "efecto_valor": 0,
-    },
-    {
-        "codigo": "botas_chispeantes",
-        "nombre": "Botas Chispeantes",
-        "descripcion": "No frenan nunca.",
-        "tipo": "armadura",
-        "slot": "botas",
-        "bonus_fuerza": 0,
-        "bonus_carisma": 0,
-        "bonus_destreza": 1,
-        "apilable": 0,
-        "efecto_tipo": None,
-        "efecto_valor": 0,
-    },
-    {
-        "codigo": "chaleco_remendado",
-        "nombre": "Chaleco Remendado",
-        "descripcion": "Parece fragil, pero impone respeto goblin.",
-        "tipo": "armadura",
-        "slot": "armadura",
-        "bonus_fuerza": 0,
-        "bonus_carisma": 1,
-        "bonus_destreza": 0,
-        "apilable": 0,
-        "efecto_tipo": None,
-        "efecto_valor": 0,
-    },
+EXTRA_ITEMS = (
     {
         "codigo": "venda_sucia",
         "nombre": "Venda Sucia",
         "descripcion": "Mejor no preguntar de donde salio.",
         "tipo": "consumible",
         "slot": None,
+        "nivel": 1,
+        "bonus_vida": 0,
         "bonus_fuerza": 0,
         "bonus_carisma": 0,
         "bonus_destreza": 0,
@@ -129,6 +82,15 @@ ITEMS = (
 STARTER_LOADOUT = (
     ("venda_sucia", 3),
 )
+
+ITEM_TYPE_TO_SLOT = {
+    "arma": "arma",
+    "casco": "casco",
+    "pechera": "armadura",
+    "calzado": "botas",
+    "amuleto": "accesorio",
+    "consumible": None,
+}
 
 
 class GameStateError(Exception):
@@ -207,6 +169,8 @@ def init_db() -> None:
                 descripcion TEXT NOT NULL,
                 tipo TEXT NOT NULL,
                 slot TEXT,
+                nivel INTEGER NOT NULL DEFAULT 1,
+                bonus_vida INTEGER NOT NULL DEFAULT 0,
                 bonus_fuerza INTEGER NOT NULL DEFAULT 0,
                 bonus_carisma INTEGER NOT NULL DEFAULT 0,
                 bonus_destreza INTEGER NOT NULL DEFAULT 0,
@@ -295,6 +259,10 @@ def _ensure_items_columns(connection: sqlite3.Connection) -> None:
         connection.execute("ALTER TABLE items ADD COLUMN efecto_tipo TEXT")
     if "efecto_valor" not in item_columns:
         connection.execute("ALTER TABLE items ADD COLUMN efecto_valor INTEGER NOT NULL DEFAULT 0")
+    if "nivel" not in item_columns:
+        connection.execute("ALTER TABLE items ADD COLUMN nivel INTEGER NOT NULL DEFAULT 1")
+    if "bonus_vida" not in item_columns:
+        connection.execute("ALTER TABLE items ADD COLUMN bonus_vida INTEGER NOT NULL DEFAULT 0")
 
 
 def _seed_archetypes(connection: sqlite3.Connection) -> None:
@@ -320,17 +288,41 @@ def _seed_items(connection: sqlite3.Connection) -> None:
     connection.executemany(
         """
         INSERT INTO items (
-            codigo, nombre, descripcion, tipo, slot,
-            bonus_fuerza, bonus_carisma, bonus_destreza, apilable, efecto_tipo, efecto_valor
+            codigo,
+            nombre,
+            descripcion,
+            tipo,
+            slot,
+            nivel,
+            bonus_vida,
+            bonus_fuerza,
+            bonus_carisma,
+            bonus_destreza,
+            apilable,
+            efecto_tipo,
+            efecto_valor
         ) VALUES (
-            :codigo, :nombre, :descripcion, :tipo, :slot,
-            :bonus_fuerza, :bonus_carisma, :bonus_destreza, :apilable, :efecto_tipo, :efecto_valor
+            :codigo,
+            :nombre,
+            :descripcion,
+            :tipo,
+            :slot,
+            :nivel,
+            :bonus_vida,
+            :bonus_fuerza,
+            :bonus_carisma,
+            :bonus_destreza,
+            :apilable,
+            :efecto_tipo,
+            :efecto_valor
         )
         ON CONFLICT(codigo) DO UPDATE SET
             nombre = excluded.nombre,
             descripcion = excluded.descripcion,
             tipo = excluded.tipo,
             slot = excluded.slot,
+            nivel = excluded.nivel,
+            bonus_vida = excluded.bonus_vida,
             bonus_fuerza = excluded.bonus_fuerza,
             bonus_carisma = excluded.bonus_carisma,
             bonus_destreza = excluded.bonus_destreza,
@@ -338,8 +330,49 @@ def _seed_items(connection: sqlite3.Connection) -> None:
             efecto_tipo = excluded.efecto_tipo,
             efecto_valor = excluded.efecto_valor
         """,
-        ITEMS,
+        _load_items_catalog(),
     )
+
+
+def _load_items_catalog() -> list[dict[str, Any]]:
+    raw_items = _load_json_file("items.json")["items"]
+    catalog = []
+    for item in raw_items:
+        normalized_type = _normalize_item_type(item["tipo"])
+        stats = item.get("estadisticas", {})
+        catalog.append(
+            {
+                "codigo": _slugify(item["nombre"]),
+                "nombre": item["nombre"],
+                "descripcion": item["descripcion"],
+                "tipo": normalized_type,
+                "slot": ITEM_TYPE_TO_SLOT[normalized_type],
+                "nivel": int(item.get("nivel", 1)),
+                "bonus_vida": int(stats.get("hp", 0)),
+                "bonus_fuerza": int(stats.get("str", 0)),
+                "bonus_carisma": int(stats.get("char", 0)),
+                "bonus_destreza": int(stats.get("dex", 0)),
+                "apilable": 0,
+                "efecto_tipo": None,
+                "efecto_valor": 0,
+            }
+        )
+
+    catalog.extend(EXTRA_ITEMS)
+    return catalog
+
+
+def _normalize_item_type(raw_type: str) -> str:
+    normalized = _slugify(raw_type)
+    if normalized not in ITEM_TYPE_TO_SLOT:
+        raise ConflictError(f"Tipo de item no soportado en items.json: '{raw_type}'.")
+    return normalized
+
+
+def _slugify(value: str) -> str:
+    normalized = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
+    normalized = re.sub(r"[^a-zA-Z0-9]+", "_", normalized.lower()).strip("_")
+    return normalized
 
 
 def _seed_zones(connection: sqlite3.Connection) -> None:
@@ -484,6 +517,8 @@ def list_items() -> list[dict[str, Any]]:
                 descripcion,
                 tipo,
                 slot,
+                nivel,
+                bonus_vida,
                 bonus_fuerza,
                 bonus_carisma,
                 bonus_destreza,
@@ -491,7 +526,7 @@ def list_items() -> list[dict[str, Any]]:
                 efecto_tipo,
                 efecto_valor
             FROM items
-            ORDER BY id
+            ORDER BY nivel, nombre
             """
         ).fetchall()
 
@@ -552,6 +587,7 @@ def get_goblin_snapshot() -> dict[str, Any]:
 
         equipment_bonus = _get_equipment_bonus(connection, goblin["id"])
         run = _get_active_run_row(connection)
+        vida_max_total = goblin["vida_max"] + equipment_bonus["vida"]
 
         return {
             "id": goblin["id"],
@@ -559,16 +595,19 @@ def get_goblin_snapshot() -> dict[str, Any]:
             "arquetipo": goblin["arquetipo_codigo"],
             "vida_actual": goblin["vida_actual"],
             "vida_max": goblin["vida_max"],
+            "vida_max_total": vida_max_total,
             "oro": goblin["oro"],
             "esta_vivo": bool(goblin["esta_vivo"]),
             "run": _row_to_dict(run),
             "stats_base": {
+                "vida": goblin["vida_max"],
                 "fuerza": goblin["fuerza_base"],
                 "carisma": goblin["carisma_base"],
                 "destreza": goblin["destreza_base"],
             },
             "bonus_equipo": equipment_bonus,
             "stats_totales": {
+                "vida": vida_max_total,
                 "fuerza": goblin["fuerza_base"] + equipment_bonus["fuerza"],
                 "carisma": goblin["carisma_base"] + equipment_bonus["carisma"],
                 "destreza": goblin["destreza_base"] + equipment_bonus["destreza"],
@@ -591,6 +630,8 @@ def list_inventory() -> list[dict[str, Any]]:
                 i.descripcion,
                 i.tipo,
                 i.slot,
+                i.nivel,
+                i.bonus_vida,
                 i.bonus_fuerza,
                 i.bonus_carisma,
                 i.bonus_destreza,
@@ -601,7 +642,7 @@ def list_inventory() -> list[dict[str, Any]]:
             FROM inventario inv
             JOIN items i ON i.id = inv.item_id
             WHERE inv.goblin_id = ?
-            ORDER BY i.nombre
+            ORDER BY i.nivel, i.nombre
             """,
             (goblin["id"],),
         ).fetchall()
@@ -624,6 +665,8 @@ def list_equipment() -> list[dict[str, Any]]:
                 i.nombre,
                 i.descripcion,
                 i.tipo,
+                i.nivel,
+                i.bonus_vida,
                 i.bonus_fuerza,
                 i.bonus_carisma,
                 i.bonus_destreza
@@ -716,14 +759,9 @@ def start_new_run(nombre: str, arquetipo_codigo: str) -> dict[str, Any]:
         if archetype is None:
             raise NotFoundError(f"El arquetipo '{arquetipo_codigo}' no existe.")
 
-        connection.execute(
-            """
-            UPDATE runs
-            SET estado = 'abandoned', ended_at = CURRENT_TIMESTAMP
-            WHERE estado = 'active'
-            """
-        )
-        connection.execute("DELETE FROM goblin")
+        active_run = _get_active_run_row(connection)
+        if active_run is not None:
+            _cleanup_run_state(connection, active_run["id"], "abandoned")
 
         run_cursor = connection.execute(
             """
@@ -771,15 +809,7 @@ def reset_run() -> dict[str, Any]:
         if active_run is None:
             raise NotFoundError("No hay una run activa para reiniciar.")
 
-        connection.execute(
-            """
-            UPDATE runs
-            SET estado = 'reset', ended_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-            """,
-            (active_run["id"],),
-        )
-        connection.execute("DELETE FROM goblin WHERE run_id = ?", (active_run["id"],))
+        _cleanup_run_state(connection, active_run["id"], "reset")
         connection.commit()
 
     return {
@@ -788,7 +818,27 @@ def reset_run() -> dict[str, Any]:
     }
 
 
-def add_loot(*, item_id: int | None = None, item_code: str | None = None, cantidad: int = 1) -> dict[str, Any]:
+def _cleanup_run_state(connection: sqlite3.Connection, run_id: int, estado: str) -> None:
+    connection.execute(
+        """
+        UPDATE runs
+        SET estado = ?, ended_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+        """,
+        (estado, run_id),
+    )
+    connection.execute("DELETE FROM run_eventos_usados WHERE run_id = ?", (run_id,))
+    connection.execute("DELETE FROM goblin WHERE run_id = ?", (run_id,))
+
+
+def add_loot(
+    *,
+    item_id: int | None = None,
+    item_code: str | None = None,
+    nivel: int | None = None,
+    zona: str | None = None,
+    cantidad: int = 1,
+) -> dict[str, Any]:
     if cantidad <= 0:
         raise ConflictError("La cantidad de loot debe ser mayor a cero.")
 
@@ -797,9 +847,29 @@ def add_loot(*, item_id: int | None = None, item_code: str | None = None, cantid
         if goblin is None:
             raise NotFoundError("No hay una run activa. Crea una con POST /run/nueva.")
 
-        item = _get_item_catalog(connection, item_id=item_id, item_code=item_code)
-        if item is None:
-            raise NotFoundError("El item indicado no existe en el catalogo.")
+        item = None
+        target_level = nivel
+
+        if item_id is not None or item_code is not None:
+            item = _get_item_catalog(connection, item_id=item_id, item_code=item_code)
+            if item is None:
+                raise NotFoundError("El item indicado no existe en el catalogo.")
+        else:
+            if zona is not None:
+                zone = connection.execute(
+                    "SELECT nivel FROM zonas WHERE codigo = ?",
+                    (zona,),
+                ).fetchone()
+                if zone is None:
+                    raise NotFoundError(f"La zona '{zona}' no existe.")
+                target_level = zone["nivel"]
+
+            if target_level is None:
+                raise ConflictError("Debes enviar item_id, item_code, nivel o zona para generar el loot.")
+
+            item = _get_random_loot_item(connection, target_level)
+            if item is None:
+                raise NotFoundError(f"No hay items disponibles para el nivel '{target_level}'.")
 
         _add_inventory_quantity(connection, goblin["id"], item["id"], cantidad)
         connection.commit()
@@ -829,7 +899,8 @@ def use_item(*, item_id: int | None = None, item_code: str | None = None) -> dic
         if effect_type != "heal":
             raise ConflictError("El item no tiene un efecto usable configurado.")
 
-        updated_life = min(goblin["vida_actual"] + effect_value, goblin["vida_max"])
+        vida_max_total = _get_effective_max_life(connection, goblin["id"], goblin["vida_max"])
+        updated_life = min(goblin["vida_actual"] + effect_value, vida_max_total)
         healed_amount = updated_life - goblin["vida_actual"]
 
         connection.execute(
@@ -1098,6 +1169,7 @@ def _get_equipment_bonus(connection: sqlite3.Connection, goblin_id: int) -> dict
     row = connection.execute(
         """
         SELECT
+            COALESCE(SUM(i.bonus_vida), 0) AS vida,
             COALESCE(SUM(i.bonus_fuerza), 0) AS fuerza,
             COALESCE(SUM(i.bonus_carisma), 0) AS carisma,
             COALESCE(SUM(i.bonus_destreza), 0) AS destreza
@@ -1109,10 +1181,16 @@ def _get_equipment_bonus(connection: sqlite3.Connection, goblin_id: int) -> dict
     ).fetchone()
 
     return {
+        "vida": row["vida"],
         "fuerza": row["fuerza"],
         "carisma": row["carisma"],
         "destreza": row["destreza"],
     }
+
+
+def _get_effective_max_life(connection: sqlite3.Connection, goblin_id: int, base_max_life: int) -> int:
+    bonus = _get_equipment_bonus(connection, goblin_id)
+    return base_max_life + bonus["vida"]
 
 
 def _get_inventory_item(
@@ -1125,8 +1203,20 @@ def _get_inventory_item(
     if item_id is not None:
         return connection.execute(
             """
-            SELECT i.id, i.codigo, i.nombre, i.slot, inv.cantidad
-                 , i.tipo, i.efecto_tipo, i.efecto_valor
+            SELECT
+                i.id,
+                i.codigo,
+                i.nombre,
+                i.slot,
+                i.tipo,
+                i.nivel,
+                i.bonus_vida,
+                i.bonus_fuerza,
+                i.bonus_carisma,
+                i.bonus_destreza,
+                i.efecto_tipo,
+                i.efecto_valor,
+                inv.cantidad
             FROM inventario inv
             JOIN items i ON i.id = inv.item_id
             WHERE inv.goblin_id = ? AND i.id = ?
@@ -1137,13 +1227,24 @@ def _get_inventory_item(
     if item_code is not None:
         return connection.execute(
             """
-            SELECT i.id, i.codigo, i.nombre, i.slot, inv.cantidad
-                 , i.tipo, i.efecto_tipo, i.efecto_valor
+            SELECT
+                i.id,
+                i.codigo,
+                i.nombre,
+                i.slot,
+                i.tipo,
+                i.nivel,
+                i.bonus_vida,
+                i.bonus_fuerza,
+                i.bonus_carisma,
+                i.bonus_destreza,
+                i.efecto_tipo,
+                i.efecto_valor,
+                inv.cantidad
             FROM inventario inv
             JOIN items i ON i.id = inv.item_id
             WHERE inv.goblin_id = ? AND i.codigo = ?
-            """
-            ,
+            """,
             (goblin_id, item_code),
         ).fetchone()
 
@@ -1218,6 +1319,8 @@ def _get_item_catalog(
                 descripcion,
                 tipo,
                 slot,
+                nivel,
+                bonus_vida,
                 bonus_fuerza,
                 bonus_carisma,
                 bonus_destreza,
@@ -1240,6 +1343,8 @@ def _get_item_catalog(
                 descripcion,
                 tipo,
                 slot,
+                nivel,
+                bonus_vida,
                 bonus_fuerza,
                 bonus_carisma,
                 bonus_destreza,
@@ -1253,6 +1358,38 @@ def _get_item_catalog(
         ).fetchone()
 
     raise ConflictError("Debes enviar item_id o item_code.")
+
+
+def _get_random_loot_item(connection: sqlite3.Connection, nivel: int) -> sqlite3.Row | None:
+    rows = connection.execute(
+        """
+        SELECT
+            id,
+            codigo,
+            nombre,
+            descripcion,
+            tipo,
+            slot,
+            nivel,
+            bonus_vida,
+            bonus_fuerza,
+            bonus_carisma,
+            bonus_destreza,
+            apilable,
+            efecto_tipo,
+            efecto_valor
+        FROM items
+        WHERE nivel = ?
+          AND slot IS NOT NULL
+        ORDER BY id
+        """,
+        (nivel,),
+    ).fetchall()
+
+    if not rows:
+        return None
+
+    return random.choice(rows)
 
 
 def _remove_inventory_quantity(
