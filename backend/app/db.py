@@ -748,14 +748,7 @@ def consume_event(zona_codigo: str, tipo_evento: str) -> dict[str, Any]:
 
 def start_new_run(nombre: str, arquetipo_codigo: str) -> dict[str, Any]:
     with get_connection() as connection:
-        archetype = connection.execute(
-            """
-            SELECT codigo, nombre, descripcion, fuerza_base, carisma_base, destreza_base
-            FROM arquetipos
-            WHERE codigo = ?
-            """,
-            (arquetipo_codigo,),
-        ).fetchone()
+        archetype = _get_archetype(connection, arquetipo_codigo)
         if archetype is None:
             raise NotFoundError(f"El arquetipo '{arquetipo_codigo}' no existe.")
 
@@ -763,41 +756,12 @@ def start_new_run(nombre: str, arquetipo_codigo: str) -> dict[str, Any]:
         if active_run is not None:
             _cleanup_run_state(connection, active_run["id"], "abandoned")
 
-        run_cursor = connection.execute(
-            """
-            INSERT INTO runs (arquetipo_codigo, goblin_nombre, estado)
-            VALUES (?, ?, 'active')
-            """,
-            (arquetipo_codigo, nombre),
+        _create_run_state(
+            connection,
+            nombre=nombre,
+            arquetipo_codigo=arquetipo_codigo,
+            archetype=archetype,
         )
-        run_id = run_cursor.lastrowid
-
-        goblin_cursor = connection.execute(
-            """
-            INSERT INTO goblin (
-                run_id,
-                nombre,
-                arquetipo_codigo,
-                fuerza_base,
-                carisma_base,
-                destreza_base,
-                vida_actual,
-                vida_max,
-                oro,
-                esta_vivo
-            ) VALUES (?, ?, ?, ?, ?, ?, 100, 100, 0, 1)
-            """,
-            (
-                run_id,
-                nombre,
-                arquetipo_codigo,
-                archetype["fuerza_base"],
-                archetype["carisma_base"],
-                archetype["destreza_base"],
-            ),
-        )
-        goblin_id = goblin_cursor.lastrowid
-        _seed_starter_inventory(connection, goblin_id)
         connection.commit()
 
     return get_goblin_snapshot()
@@ -809,12 +773,24 @@ def reset_run() -> dict[str, Any]:
         if active_run is None:
             raise NotFoundError("No hay una run activa para reiniciar.")
 
+        archetype = _get_archetype(connection, active_run["arquetipo_codigo"])
+        if archetype is None:
+            raise NotFoundError(f"El arquetipo '{active_run['arquetipo_codigo']}' no existe.")
+
         _cleanup_run_state(connection, active_run["id"], "reset")
+        _create_run_state(
+            connection,
+            nombre=active_run["goblin_nombre"],
+            arquetipo_codigo=active_run["arquetipo_codigo"],
+            archetype=archetype,
+        )
         connection.commit()
 
     return {
-        "message": "La run fue reiniciada y el estado actual se borro.",
-        "run_id": active_run["id"],
+        "message": "La run fue reiniciada correctamente.",
+        "goblin": get_goblin_snapshot(),
+        "inventario": list_inventory(),
+        "equipo": list_equipment(),
     }
 
 
@@ -829,6 +805,61 @@ def _cleanup_run_state(connection: sqlite3.Connection, run_id: int, estado: str)
     )
     connection.execute("DELETE FROM run_eventos_usados WHERE run_id = ?", (run_id,))
     connection.execute("DELETE FROM goblin WHERE run_id = ?", (run_id,))
+
+
+def _get_archetype(connection: sqlite3.Connection, arquetipo_codigo: str) -> sqlite3.Row | None:
+    return connection.execute(
+        """
+        SELECT codigo, nombre, descripcion, fuerza_base, carisma_base, destreza_base
+        FROM arquetipos
+        WHERE codigo = ?
+        """,
+        (arquetipo_codigo,),
+    ).fetchone()
+
+
+def _create_run_state(
+    connection: sqlite3.Connection,
+    *,
+    nombre: str,
+    arquetipo_codigo: str,
+    archetype: sqlite3.Row,
+) -> None:
+    run_cursor = connection.execute(
+        """
+        INSERT INTO runs (arquetipo_codigo, goblin_nombre, estado)
+        VALUES (?, ?, 'active')
+        """,
+        (arquetipo_codigo, nombre),
+    )
+    run_id = run_cursor.lastrowid
+
+    goblin_cursor = connection.execute(
+        """
+        INSERT INTO goblin (
+            run_id,
+            nombre,
+            arquetipo_codigo,
+            fuerza_base,
+            carisma_base,
+            destreza_base,
+            vida_actual,
+            vida_max,
+            oro,
+            esta_vivo
+        ) VALUES (?, ?, ?, ?, ?, ?, 100, 100, 0, 1)
+        """,
+        (
+            run_id,
+            nombre,
+            arquetipo_codigo,
+            archetype["fuerza_base"],
+            archetype["carisma_base"],
+            archetype["destreza_base"],
+        ),
+    )
+    goblin_id = goblin_cursor.lastrowid
+    _seed_starter_inventory(connection, goblin_id)
 
 
 def add_loot(

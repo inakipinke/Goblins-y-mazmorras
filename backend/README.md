@@ -60,6 +60,7 @@ Usa `.\backend\start.ps1` sin `-Install` si solo queres volver a levantarlo usan
 - `POST /equipo/equipar`
 - `POST /equipo/desequipar/{slot}`
 - `POST /goblin/recibir-dano`
+- `POST /goblin/stats/asignar`
 - `POST /run/derrota`
 - `GET /docs`
 
@@ -76,6 +77,10 @@ http://127.0.0.1:8000
 - La tabla `items` se carga automaticamente desde `items.json` en la raiz del repo.
 - `POST /inventario/loot` ahora puede recibir un item especifico o generar uno aleatorio por `nivel` o `zona`.
 - Cada run nueva arranca limpia: sin equipo, con vida base, con inventario inicial base y sin eventos ya consumidos.
+- `POST /run/reset` ahora cierra la run activa y crea otra nueva al instante con el mismo nombre y arquetipo, pero reiniciada desde cero.
+- `POST /goblin/stats/asignar` modifica solo los stats base del goblin de la run activa; nunca toca el arquetipo original.
+- Los items equipados pueden sumar `bonus_vida` a la vida maxima total, pero la vida base de cada run vuelve a `100`.
+- Regla del repo: cada API nueva debe agregarse tambien a esta documentacion.
 
 ## Ejemplos utiles
 
@@ -88,6 +93,37 @@ POST /run/nueva
   "arquetipo": "romantico"
 }
 ```
+
+### Reiniciar run
+
+```json
+POST /run/reset
+```
+
+Reinicia la run activa y arranca otra nueva en el momento con:
+
+- el mismo nombre
+- el mismo arquetipo
+- stats base limpias del arquetipo
+- `vida_actual = 100`
+- `vida_max = 100`
+- inventario inicial
+- equipo vacio
+
+### Asignar puntos base al goblin
+
+```json
+POST /goblin/stats/asignar
+{
+  "stat": "fuerza",
+  "cantidad": 3
+}
+```
+
+`stat` puede ser `vida`, `fuerza`, `carisma` o `destreza`.
+Los puntos se aplican solo al goblin de la run activa.
+
+Si el stat es `vida`, se incrementan tanto `vida_max` como `vida_actual`.
 
 ### Loot directo
 

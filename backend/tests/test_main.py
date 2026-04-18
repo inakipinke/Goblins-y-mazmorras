@@ -130,14 +130,37 @@ def test_unequip_returns_item_to_inventory(client: TestClient) -> None:
     assert unequip_response.json()["goblin"]["stats_totales"]["destreza"] == 15
 
 
-def test_reset_run_clears_current_state(client: TestClient) -> None:
+def test_reset_run_starts_a_fresh_run_with_same_archetype(client: TestClient) -> None:
     client.post("/run/nueva", json={"nombre": "Finito", "arquetipo": "malo"})
+    client.post("/goblin/stats/asignar", json={"stat": "fuerza", "cantidad": 4})
+    client.post("/goblin/recibir-dano", json={"cantidad": 20})
+    client.post("/inventario/loot", json={"item_code": "espada_oxidada", "cantidad": 1})
+    client.post("/equipo/equipar", json={"item_code": "espada_oxidada"})
 
     reset_response = client.post("/run/reset")
 
     assert reset_response.status_code == 200
-    goblin_response = client.get("/goblin")
-    assert goblin_response.status_code == 404
+    goblin = reset_response.json()["goblin"]
+    assert goblin["nombre"] == "Finito"
+    assert goblin["arquetipo"] == "malo"
+    assert goblin["vida_actual"] == 100
+    assert goblin["vida_max"] == 100
+    assert goblin["stats_base"] == {
+        "vida": 100,
+        "fuerza": 15,
+        "carisma": 8,
+        "destreza": 12,
+    }
+    assert goblin["stats_totales"] == {
+        "vida": 100,
+        "fuerza": 15,
+        "carisma": 8,
+        "destreza": 12,
+    }
+    assert reset_response.json()["equipo"] == []
+    assert len(reset_response.json()["inventario"]) == 1
+    assert reset_response.json()["inventario"][0]["codigo"] == "venda_sucia"
+    assert reset_response.json()["inventario"][0]["cantidad"] == 3
 
 
 def test_cannot_equip_without_active_run(client: TestClient) -> None:
@@ -307,9 +330,6 @@ def test_new_run_starts_with_clean_events_after_reset(client: TestClient) -> Non
 
     reset_response = client.post("/run/reset")
     assert reset_response.status_code == 200
-
-    second_run = client.post("/run/nueva", json={"nombre": "Segundo", "arquetipo": "romantico"})
-    assert second_run.status_code == 200
 
     second_event = client.post(
         "/eventos/consumir",
