@@ -619,7 +619,6 @@ body::before {
     #chatInput {
         font-size: 16px; /* Prevent zoom on iOS */
     }
-<<<<<<< HEAD
     
     .stats-row {
         flex-direction: column;
@@ -669,6 +668,4 @@ body::before {
     cursor: not-allowed;
     transform: none;
 }
-=======
 }
->>>>>>> 07ff8960907b222073757045b4a65f360ba4423e

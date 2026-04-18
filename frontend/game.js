@@ -7,15 +7,11 @@ class HexGame {
         this.ringWidths = [1, 8, 8, 6]; // Larger map: Center, inner, middle, outer ring widths
         this.maxRadius = this.ringWidths.reduce((sum, width) => sum + width, 0) - 1;
         this.hexSize = 30; // Fixed hex size for consistent zoom
-<<<<<<< HEAD
-        this.apiBaseUrl = CONFIG.API_BASE_URL;
         this.playerStats = { fuerza: 0, carisma: 0, destreza: 0, hp: 0 };
-=======
         this.apiBaseUrl = (window.CONFIG && window.CONFIG.API_BASE_URL)
             ? window.CONFIG.API_BASE_URL
             : this.resolveApiBaseUrl();
         this.inventoryItems = [];
->>>>>>> 07ff8960907b222073757045b4a65f360ba4423e
         this.eventCatalog = [
             { type: 'Combate', icon: '⚔️', color: '#e74c3c', probability: 0.16, message: '⚔️ Enemies close in. Time for a fight.' },
             { type: 'Jefe', icon: '👑', color: '#c0392b', probability: 0.05, message: '👑 A mighty boss blocks your path.' },
