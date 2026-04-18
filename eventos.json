@@ -2,6 +2,7 @@
   "events": [
     {
       "name": "Trampa",
+      "type": "Combate",
       "description": "Un animal salvaje te ataca.",
       "options": [
         { "stat": "STR", "value": 10, "action": "Ganar" },
@@ -14,14 +15,17 @@
     },
     {
       "name": "Arbol rejuvenecedor",
+      "type": "Santuario",
       "effect": { "hp": 20 }
     },
     {
       "name": "Cofre misterioso",
+      "type": "Objeto misterioso",
       "effect": { "equipment": 1, "gold": 10 }
     },
     {
       "name": "Guarida de ladrones",
+      "type": "Combate",
       "options": [
         { "stat": "STR", "value": 25, "action": "Ganar" },
         { "stat": "DEX", "value": 15, "action": "Huir" },
@@ -33,14 +37,17 @@
     },
     {
       "name": "Altar de los dioses",
+      "type": "Santuario",
       "effect": { "skillPoints": 5 }
     },
     {
       "name": "Pozo de los marcos",
+      "type": "Objeto misterioso",
       "effect": { "hp": -10, "char": 1 }
     },
     {
       "name": "Escuela de ladrones",
+      "type": "Entrenamiento",
       "effect": {
         "hp": -10,
         "dex": 5,
@@ -50,10 +57,12 @@
     },
     {
       "name": "Gimnasio de los proteicos",
+      "type": "Entrenamiento",
       "effect": { "hp": 20, "str": 10, "dex": 5, "char": -10 }
     },
     {
       "name": "Plazoleta de los indeseables",
+      "type": "Combate",
       "options": [
         { "stat": "STR", "value": 20, "action": "Ganar" },
         { "stat": "DEX", "value": 30, "action": "Ganar" },
@@ -64,10 +73,12 @@
     },
     {
       "name": "Pequeño comerciante",
+      "type": "Comerciante",
       "effect": { "gold": -30, "equipment": 1 }
     },
     {
       "name": "Iglesia de los payenes",
+      "type": "Santuario",
       "effect": {
         "char": 5,
         "gold": 10,
@@ -76,6 +87,7 @@
     },
     {
       "name": "Tribu de brutos",
+      "type": "Combate",
       "options": [
         { "stat": "STR", "value": 30, "action": "Ganar" },
         { "stat": "DEX", "value": 15, "action": "Huir" },
@@ -89,6 +101,7 @@
     },
     {
       "name": "Campo misterioso",
+      "type": "Trampa",
       "description": "Enemigos sorpresa",
       "options": [
         { "stat": "STR", "value": 25, "action": "Ganar" },
@@ -104,6 +117,7 @@
     },
     {
       "name": "Mercado negro",
+      "type": "Comerciante",
       "options": [
         { "stat": "CHAR", "value": 20, "action": "Negociar" },
         { "stat": "DEX", "value": 15, "action": "Robar" },
@@ -114,6 +128,7 @@
     },
     {
       "name": "Bestia herida",
+      "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 15, "action": "Curar" },
         { "stat": "STR", "value": 20, "action": "Rematar" },
@@ -127,6 +142,7 @@
     },
     {
       "name": "Puente inestable",
+      "type": "Trampa",
       "options": [
         { "stat": "DEX", "value": 25, "action": "Cruzar" },
         { "stat": "STR", "value": 15, "action": "Forzar paso" }
@@ -136,6 +152,7 @@
     },
     {
       "name": "Vagabundo sabio",
+      "type": "Social",
       "options": [
         { "stat": "CHAR", "value": 20, "action": "Escuchar" }
       ],
@@ -143,6 +160,7 @@
     },
     {
       "name": "Emboscada nocturna",
+      "type": "Trampa",
       "options": [
         { "stat": "DEX", "value": 30, "action": "Esquivar" },
         { "stat": "STR", "value": 25, "action": "Luchar" }
@@ -152,6 +170,7 @@
     },
     {
       "name": "Biblioteca abandonada",
+      "type": "Exploración",
       "options": [
         { "stat": "CHAR", "value": 20, "action": "Investigar" }
       ],
@@ -160,6 +179,7 @@
     },
     {
       "name": "Pantano venenoso",
+      "type": "Trampa",
       "options": [
         { "stat": "DEX", "value": 25, "action": "Cruzar" },
         { "stat": "STR", "value": 20, "action": "Avanzar" }
@@ -169,6 +189,7 @@
     },
     {
       "name": "Espíritu del bosque",
+      "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Convencer" },
         { "stat": "STR", "value": 20, "action": "Atacar" }
@@ -178,6 +199,7 @@
     },
     {
       "name": "Arena de combate",
+      "type": "Combate",
       "options": [
         { "stat": "STR", "value": 30, "action": "Pelear" },
         { "stat": "DEX", "value": 25, "action": "Esquivar" }
@@ -187,6 +209,7 @@
     },
     {
       "name": "Cofre maldito",
+      "type": "Objeto misterioso",
       "options": [
         { "stat": "DEX", "value": 20, "action": "Abrir" },
         { "stat": "CHAR", "value": 25, "action": "Resistir" }
@@ -196,6 +219,7 @@
     },
     {
       "name": "Torre derrumbada",
+      "type": "Exploración",
       "options": [
         { "stat": "DEX", "value": 25, "action": "Escalar" },
         { "stat": "STR", "value": 20, "action": "Despejar" }
@@ -205,6 +229,7 @@
     },
     {
       "name": "Mensajero perdido",
+      "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 15, "action": "Ayudar" }
       ],
@@ -212,6 +237,7 @@
     },
     {
       "name": "Clan de mercenarios",
+      "type": "Combate",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Negociar" },
         { "stat": "STR", "value": 25, "action": "Enfrentar" }
@@ -221,6 +247,7 @@
     },
     {
       "name": "Fuente mágica",
+      "type": "Objeto misterioso",
       "effect": {
         "random": [
           { "hp": 20 },
@@ -231,6 +258,7 @@
     },
     {
       "name": "Trampa explosiva",
+      "type": "Trampa",
       "options": [
         { "stat": "DEX", "value": 30, "action": "Desactivar" }
       ],
@@ -239,6 +267,7 @@
     },
     {
       "name": "Ritual oscuro",
+      "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Resistir" },
         { "stat": "STR", "value": 25, "action": "Interrumpir" }
@@ -248,6 +277,7 @@
     },
     {
       "name": "Cazador solitario",
+      "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 20, "action": "Persuadir" },
         { "stat": "DEX", "value": 25, "action": "Huir" }
@@ -257,6 +287,7 @@
     },
     {
       "name": "Mina abandonada",
+      "type": "Exploración",
       "options": [
         { "stat": "DEX", "value": 25, "action": "Explorar" },
         { "stat": "STR", "value": 20, "action": "Excavar" }
@@ -266,6 +297,7 @@
     },
     {
       "name": "Noble en peligro",
+      "type": "Encuentro",
       "options": [
         { "stat": "STR", "value": 20, "action": "Salvar" },
         { "stat": "CHAR", "value": 25, "action": "Negociar" }
@@ -275,6 +307,7 @@
     },
     {
       "name": "Portal extraño",
+      "type": "Objeto misterioso",
       "effect": {
         "success": { "skillPoints": 5, "hp": 10 },
         "failure": { "hp": -30, "loseEquipment": 1 }
@@ -282,6 +315,7 @@
     },
     {
       "name": "Caravana rota",
+      "type": "Exploración",
       "description": "Encuentras una carreta saqueada al borde del camino.",
       "options": [
         { "stat": "DEX", "value": 20, "action": "Rebuscar" },
@@ -293,6 +327,7 @@
     },
     {
       "name": "Cueva resonante",
+      "type": "Exploración",
       "description": "Una cueva emite sonidos extraños que parecen voces.",
       "options": [
         { "stat": "CHAR", "value": 25, "action": "Interpretar los susurros" },
@@ -304,6 +339,7 @@
     },
     {
       "name": "Mercader ambulante sospechoso",
+      "type": "Comerciante",
       "options": [
         { "stat": "CHAR", "value": 20, "action": "Regatear" },
         { "stat": "DEX", "value": 20, "action": "Robarle" },
@@ -314,6 +350,7 @@
     },
     {
       "name": "Lago cristalino",
+      "type": "Objeto misterioso",
       "description": "El agua parece pura, pero algo se mueve debajo.",
       "options": [
         { "stat": "DEX", "value": 20, "action": "Pescar algo brillante" },
@@ -330,6 +367,7 @@
     },
     {
       "name": "Campamento de cazadores",
+      "type": "Social",
       "options": [
         { "stat": "CHAR", "value": 20, "action": "Compartir historias" },
         { "stat": "STR", "value": 20, "action": "Impresionarlos" },
@@ -340,6 +378,7 @@
     },
     {
       "name": "Ruinas encantadas",
+      "type": "Exploración",
       "description": "Viejas estructuras cubiertas de runas te rodean.",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Leer las runas" },
@@ -350,6 +389,7 @@
     },
     {
       "name": "Pozo de los deseos",
+      "type": "Objeto misterioso",
       "effect": {
         "gold": -10,
         "random": [
@@ -362,6 +402,7 @@
     },
     {
       "name": "Patrulla real",
+      "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 25, "action": "Convencerlos de ayudarte" },
         { "stat": "DEX", "value": 20, "action": "Escabullirte" },
@@ -372,6 +413,7 @@
     },
     {
       "name": "Duelo callejero",
+      "type": "Combate",
       "description": "Un fanfarrón te desafía frente a todos.",
       "options": [
         { "stat": "STR", "value": 25, "action": "Aceptar el duelo" },
@@ -383,6 +425,7 @@
     },
     {
       "name": "Monje errante",
+      "type": "Social",
       "options": [
         { "stat": "CHAR", "value": 20, "action": "Escuchar su enseñanza" }
       ],
@@ -391,6 +434,7 @@
     },
     {
       "name": "Nido de alimañas",
+      "type": "Combate",
       "description": "Has perturbado una colonia agresiva.",
       "options": [
         { "stat": "DEX", "value": 25, "action": "Escapar" },
@@ -401,6 +445,7 @@
     },
     {
       "name": "Herrero cansado",
+      "type": "Encuentro",
       "description": "Un herrero agotado pide ayuda para mover materiales.",
       "options": [
         { "stat": "STR", "value": 20, "action": "Ayudarlo" },
@@ -411,6 +456,7 @@
     },
     {
       "name": "Bandada de cuervos",
+      "type": "Encuentro",
       "description": "Los cuervos te rodean como si custodiaran algo.",
       "options": [
         { "stat": "CHAR", "value": 25, "action": "Calmarlos" },
@@ -421,6 +467,7 @@
     },
     {
       "name": "Taberna clandestina",
+      "type": "Social",
       "options": [
         { "stat": "CHAR", "value": 20, "action": "Socializar" },
         { "stat": "DEX", "value": 20, "action": "Hacer trampas en los juegos" },
@@ -437,6 +484,7 @@
     },
     {
       "name": "Estatua viviente",
+      "type": "Jefe",
       "description": "Una estatua se mueve cuando no la miras.",
       "options": [
         { "stat": "DEX", "value": 30, "action": "Evitar su ataque" },
@@ -448,6 +496,7 @@
     },
     {
       "name": "Huérfano carterista",
+      "type": "Encuentro",
       "description": "Un niño intenta robarte la bolsa y luego te mira con miedo.",
       "options": [
         { "stat": "DEX", "value": 15, "action": "Atraparlo" },
@@ -463,6 +512,7 @@
     },
     {
       "name": "Santuario olvidado",
+      "type": "Santuario",
       "options": [
         { "stat": "CHAR", "value": 25, "action": "Rezar" },
         { "stat": "DEX", "value": 20, "action": "Buscar compartimentos ocultos" }
@@ -472,6 +522,7 @@
     },
     {
       "name": "Círculo de hongos",
+      "type": "Objeto misterioso",
       "description": "Un extraño anillo de hongos crece en medio del bosque.",
       "options": [
         { "stat": "CHAR", "value": 20, "action": "Entrar con respeto" },
@@ -488,6 +539,7 @@
     },
     {
       "name": "Torneo local",
+      "type": "Jefe",
       "options": [
         { "stat": "STR", "value": 30, "action": "Competir en fuerza" },
         { "stat": "DEX", "value": 30, "action": "Competir en agilidad" },
@@ -498,11 +550,24 @@
     },
     {
       "name": "Cadáver del explorador",
+      "type": "Exploración",
       "description": "Encuentras el cuerpo de un aventurero con un mapa en la mano.",
       "options": [
         { "stat": "DEX", "value": 20, "action": "Revisarlo rápido" },
         { "stat": "CHAR", "value": 20, "action": "Dar sepultura primero" },
         { "stat": "STR", "value": 20, "action": "Mover una roca cercana" }
+      ],
+      "success": { "items": ["Mapa del tesoro"], "gold": 10 },
+      "failure": { "hp": -10, "loseEquipment": 1 }
+    },
+    {
+      "name": "Duelo contra el chiqui tapia",
+      "type": "Jefe",
+      "description": "Entras accidentalmente a la bombonera y te cruzas con el despiadado, maquiavélico y temible Chiqui Tapia, el cual celoso de tu altura se enfurece y arremete contra ti.",
+      "options": [
+        { "stat": "DEX", "value": 45, "action": "Derrotarlo" },
+        { "stat": "CHAR", "value": 20, "action": "Confundirlo con palabras" },
+        { "stat": "STR", "value": 20, "action": "Enfrentarlo cuerpo a cuerpo" }
       ],
       "success": { "items": ["Mapa del tesoro"], "gold": 10 },
       "failure": { "hp": -10, "loseEquipment": 1 }

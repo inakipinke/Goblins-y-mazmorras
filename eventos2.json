@@ -3,6 +3,7 @@
   "events": [
     {
       "name": "Emboscada de lobos negros",
+      "type": "Combate",
       "description": "Una manada de lobos enormes te rodea en silencio.",
       "options": [
         { "stat": "STR", "value": 35, "action": "Abrirte paso" },
@@ -14,14 +15,17 @@
     },
     {
       "name": "Santuario vital mayor",
+      "type": "Santuario",
       "effect": { "hp": 35 }
     },
     {
       "name": "Cofre del viajero perdido",
+      "type": "Objeto misterioso",
       "effect": { "equipment": 1, "gold": 25 }
     },
     {
       "name": "Refugio de bandoleros veteranos",
+      "type": "Combate",
       "options": [
         { "stat": "STR", "value": 40, "action": "Asaltar el refugio" },
         { "stat": "DEX", "value": 30, "action": "Escabullirte" },
@@ -32,14 +36,17 @@
     },
     {
       "name": "Altar de guerra",
+      "type": "Santuario",
       "effect": { "skillPoints": 7, "str": 3 }
     },
     {
       "name": "Pozo de ecos",
+      "type": "Objeto misterioso",
       "effect": { "hp": -15, "char": 2, "skillPoints": 1 }
     },
     {
       "name": "Academia del sigilo",
+      "type": "Entrenamiento",
       "effect": {
         "hp": -15,
         "dex": 8,
@@ -49,10 +56,12 @@
     },
     {
       "name": "Forja de los proteicos",
+      "type": "Entrenamiento",
       "effect": { "hp": 25, "str": 12, "dex": 6, "char": -8 }
     },
     {
       "name": "Plaza de duelistas",
+      "type": "Jefe",
       "options": [
         { "stat": "STR", "value": 35, "action": "Retar al campeón" },
         { "stat": "DEX", "value": 35, "action": "Vencer por agilidad" },
@@ -63,10 +72,12 @@
     },
     {
       "name": "Mercader de reliquias",
+      "type": "Comerciante",
       "effect": { "gold": -50, "equipment": 2 }
     },
     {
       "name": "Templo de los payenes mayores",
+      "type": "Santuario",
       "effect": {
         "char": 8,
         "gold": 20,
@@ -75,6 +86,7 @@
     },
     {
       "name": "Clan de brutos acorazados",
+      "type": "Combate",
       "options": [
         { "stat": "STR", "value": 45, "action": "Derrotarlos" },
         { "stat": "DEX", "value": 25, "action": "Huir" },
@@ -85,6 +97,7 @@
     },
     {
       "name": "Campos de niebla",
+      "type": "Trampa",
       "description": "Formas hostiles emergen de la neblina.",
       "options": [
         { "stat": "STR", "value": 35, "action": "Romper la línea enemiga" },
@@ -95,6 +108,7 @@
     },
     {
       "name": "Casa de apuestas clandestina",
+      "type": "Social",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Convencer a la mesa" },
         { "stat": "DEX", "value": 25, "action": "Hacer trampa" },
@@ -105,6 +119,7 @@
     },
     {
       "name": "Bestia encadenada",
+      "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Liberarla con cuidado" },
         { "stat": "STR", "value": 35, "action": "Domarla a la fuerza" },
@@ -115,6 +130,7 @@
     },
     {
       "name": "Puente colgante roto",
+      "type": "Trampa",
       "options": [
         { "stat": "DEX", "value": 35, "action": "Cruzar saltando" },
         { "stat": "STR", "value": 25, "action": "Sostener y avanzar" }
@@ -124,6 +140,7 @@
     },
     {
       "name": "Maestro errante",
+      "type": "Social",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Aprender de él" }
       ],
@@ -131,6 +148,7 @@
     },
     {
       "name": "Emboscada en el desfiladero",
+      "type": "Trampa",
       "options": [
         { "stat": "DEX", "value": 35, "action": "Cubrirte y contraatacar" },
         { "stat": "STR", "value": 40, "action": "Cargar de frente" }
@@ -140,6 +158,7 @@
     },
     {
       "name": "Archivo prohibido",
+      "type": "Exploración",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Descifrar los escritos" }
       ],
@@ -148,6 +167,7 @@
     },
     {
       "name": "Laguna tóxica",
+      "type": "Trampa",
       "options": [
         { "stat": "DEX", "value": 35, "action": "Cruzar por las piedras" },
         { "stat": "STR", "value": 30, "action": "Abrirte paso nadando" }
@@ -157,6 +177,7 @@
     },
     {
       "name": "Ancestro del bosque",
+      "type": "Jefe",
       "options": [
         { "stat": "CHAR", "value": 40, "action": "Pedir su favor" },
         { "stat": "STR", "value": 30, "action": "Enfrentarlo" }
@@ -166,6 +187,7 @@
     },
     {
       "name": "Foso de gladiadores",
+      "type": "Jefe",
       "options": [
         { "stat": "STR", "value": 45, "action": "Ganar el combate" },
         { "stat": "DEX", "value": 35, "action": "Sobrevivir por agilidad" }
@@ -175,6 +197,7 @@
     },
     {
       "name": "Arcón maldito",
+      "type": "Objeto misterioso",
       "options": [
         { "stat": "DEX", "value": 30, "action": "Forzar cerradura" },
         { "stat": "CHAR", "value": 35, "action": "Romper la maldición" }
@@ -184,6 +207,7 @@
     },
     {
       "name": "Torre quebrada",
+      "type": "Exploración",
       "options": [
         { "stat": "DEX", "value": 35, "action": "Escalar hasta la cima" },
         { "stat": "STR", "value": 30, "action": "Mover los escombros" }
@@ -193,6 +217,7 @@
     },
     {
       "name": "Mensajero del rey",
+      "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 25, "action": "Auxiliarlo" }
       ],
@@ -200,6 +225,7 @@
     },
     {
       "name": "Compañía mercenaria",
+      "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 40, "action": "Contratar su apoyo" },
         { "stat": "STR", "value": 35, "action": "Vencer a su líder" }
@@ -209,6 +235,7 @@
     },
     {
       "name": "Fuente lunar",
+      "type": "Objeto misterioso",
       "effect": {
         "random": [
           { "hp": 30 },
@@ -220,6 +247,7 @@
     },
     {
       "name": "Trampa de hierro",
+      "type": "Trampa",
       "options": [
         { "stat": "DEX", "value": 40, "action": "Desactivarla" }
       ],
@@ -228,6 +256,7 @@
     },
     {
       "name": "Rito sangriento",
+      "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 40, "action": "Resistir su influencia" },
         { "stat": "STR", "value": 35, "action": "Interrumpir el rito" }
@@ -237,6 +266,7 @@
     },
     {
       "name": "Cazador de recompensas",
+      "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Disuadirlo" },
         { "stat": "DEX", "value": 35, "action": "Perderlo entre sombras" }
@@ -246,6 +276,7 @@
     },
     {
       "name": "Mina profunda",
+      "type": "Exploración",
       "options": [
         { "stat": "DEX", "value": 35, "action": "Explorar las galerías" },
         { "stat": "STR", "value": 30, "action": "Abrir un túnel cerrado" }
@@ -255,6 +286,7 @@
     },
     {
       "name": "Noble sitiado",
+      "type": "Encuentro",
       "options": [
         { "stat": "STR", "value": 30, "action": "Rescatarlo" },
         { "stat": "CHAR", "value": 35, "action": "Cobrar una gran recompensa" }
@@ -264,6 +296,7 @@
     },
     {
       "name": "Portal agrietado",
+      "type": "Objeto misterioso",
       "effect": {
         "success": { "skillPoints": 6, "hp": 15, "char": 2 },
         "failure": { "hp": -35, "loseEquipment": 1 }
@@ -271,6 +304,7 @@
     },
     {
       "name": "Caravana imperial destruida",
+      "type": "Exploración",
       "description": "Restos de guardias y cajas de lujo cubren el suelo.",
       "options": [
         { "stat": "DEX", "value": 30, "action": "Saquear rápido" },
@@ -282,6 +316,7 @@
     },
     {
       "name": "Caverna de los murmullos",
+      "type": "Exploración",
       "description": "Las piedras responden a tus pensamientos.",
       "options": [
         { "stat": "CHAR", "value": 35, "action": "Interpretar la voz de la cueva" },
@@ -293,6 +328,7 @@
     },
     {
       "name": "Mercader del desierto",
+      "type": "Comerciante",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Regatear" },
         { "stat": "DEX", "value": 30, "action": "Robar mercancía" },
@@ -303,6 +339,7 @@
     },
     {
       "name": "Lago del espejo",
+      "type": "Objeto misterioso",
       "description": "La superficie refleja una versión mejor de ti.",
       "options": [
         { "stat": "DEX", "value": 30, "action": "Tomar el objeto del fondo" },
@@ -319,6 +356,7 @@
     },
     {
       "name": "Puesto de cazadores veteranos",
+      "type": "Social",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Compartir botines" },
         { "stat": "STR", "value": 30, "action": "Impresionarlos" },
@@ -329,6 +367,7 @@
     },
     {
       "name": "Ruinas del juramento",
+      "type": "Exploración",
       "description": "Un antiguo templo conserva sellos aún vivos.",
       "options": [
         { "stat": "CHAR", "value": 40, "action": "Leer el juramento" },
@@ -339,6 +378,7 @@
     },
     {
       "name": "Pozo de plegarias",
+      "type": "Objeto misterioso",
       "effect": {
         "gold": -15,
         "random": [
@@ -351,6 +391,7 @@
     },
     {
       "name": "Guardia fronteriza",
+      "type": "Encuentro",
       "options": [
         { "stat": "CHAR", "value": 35, "action": "Convencerlos de dejarte pasar" },
         { "stat": "DEX", "value": 30, "action": "Cruzar por las sombras" },
@@ -361,6 +402,7 @@
     },
     {
       "name": "Desafío del duelista carmesí",
+      "type": "Jefe",
       "description": "Un espadachín famoso exige una muestra de valor.",
       "options": [
         { "stat": "STR", "value": 35, "action": "Aceptar el duelo" },
@@ -372,6 +414,7 @@
     },
     {
       "name": "Asceta de la colina",
+      "type": "Social",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Escuchar su doctrina" }
       ],
@@ -380,6 +423,7 @@
     },
     {
       "name": "Nido de carroñeros gigantes",
+      "type": "Combate",
       "description": "Los chillidos atraen más criaturas cada segundo.",
       "options": [
         { "stat": "DEX", "value": 35, "action": "Huir entre rocas" },
@@ -390,6 +434,7 @@
     },
     {
       "name": "Herrero de campaña",
+      "type": "Encuentro",
       "description": "Te ofrece mejorar algo si lo ayudas con el trabajo pesado.",
       "options": [
         { "stat": "STR", "value": 30, "action": "Ayudarlo" },
@@ -400,6 +445,7 @@
     },
     {
       "name": "Cuervos del augurio",
+      "type": "Encuentro",
       "description": "Las aves parecen custodiar una tumba reciente.",
       "options": [
         { "stat": "CHAR", "value": 35, "action": "Apaciguarlos" },
@@ -410,6 +456,7 @@
     },
     {
       "name": "Sala de apuestas",
+      "type": "Social",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Dominar la mesa" },
         { "stat": "DEX", "value": 30, "action": "Manipular los dados" },
@@ -426,6 +473,7 @@
     },
     {
       "name": "Coloso inmóvil",
+      "type": "Jefe",
       "description": "Una estatua ciclópea despierta con un crujido.",
       "options": [
         { "stat": "DEX", "value": 40, "action": "Evitar sus golpes" },
@@ -437,6 +485,7 @@
     },
     {
       "name": "Joven carterista",
+      "type": "Encuentro",
       "description": "Te roba y vacila al ver que lo descubres.",
       "options": [
         { "stat": "DEX", "value": 25, "action": "Atraparlo" },
@@ -452,6 +501,7 @@
     },
     {
       "name": "Capilla olvidada",
+      "type": "Santuario",
       "options": [
         { "stat": "CHAR", "value": 35, "action": "Orar en silencio" },
         { "stat": "DEX", "value": 30, "action": "Buscar un escondite secreto" }
@@ -461,6 +511,7 @@
     },
     {
       "name": "Anillo de hongos azules",
+      "type": "Objeto misterioso",
       "description": "Las esporas brillan cuando te acercas.",
       "options": [
         { "stat": "CHAR", "value": 30, "action": "Entrar con respeto" },
@@ -477,6 +528,7 @@
     },
     {
       "name": "Festival marcial",
+      "type": "Jefe",
       "options": [
         { "stat": "STR", "value": 45, "action": "Ganar el torneo de fuerza" },
         { "stat": "DEX", "value": 45, "action": "Ganar el torneo de agilidad" },
@@ -487,6 +539,7 @@
     },
     {
       "name": "Restos del explorador",
+      "type": "Exploración",
       "description": "Un aventurero muerto protege un secreto con su último agarre.",
       "options": [
         { "stat": "DEX", "value": 30, "action": "Registrarlo con rapidez" },
@@ -498,6 +551,7 @@
     },
     {
       "name": "Jauría del pantano",
+      "type": "Combate",
       "description": "Criaturas flacas y veloces te persiguen entre el barro.",
       "options": [
         { "stat": "STR", "value": 38, "action": "Hacerles frente" },
@@ -509,6 +563,7 @@
     },
     {
       "name": "Cripta del caballero caído",
+      "type": "Jefe",
       "description": "Un sepulcro antiguo guarda armas y resentimiento.",
       "options": [
         { "stat": "STR", "value": 42, "action": "Vencer al guardián" },
@@ -520,6 +575,7 @@
     },
     {
       "name": "Biblioteca hundida",
+      "type": "Exploración",
       "description": "Los tomos rescatables se deshacen entre tus dedos.",
       "options": [
         { "stat": "CHAR", "value": 34, "action": "Salvar el conocimiento" },
