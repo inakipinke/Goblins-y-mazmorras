@@ -6,7 +6,47 @@ $ErrorActionPreference = "Stop"
 
 $backendRoot = $PSScriptRoot
 $venvPath = Join-Path $backendRoot ".venv"
-$venvPython = Join-Path $venvPath "Scripts\\python.exe"
+
+function Get-VenvPython {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$VirtualEnvPath
+    )
+
+    $candidates = @(
+        (Join-Path $VirtualEnvPath "Scripts\\python.exe"),
+        (Join-Path $VirtualEnvPath "bin\\python.exe")
+    )
+
+    foreach ($candidate in $candidates) {
+        if (Test-Path $candidate) {
+            return $candidate
+        }
+    }
+
+    return $candidates[0]
+}
+
+function Remove-VenvSafely {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$VirtualEnvPath
+    )
+
+    if (-not (Test-Path $VirtualEnvPath)) {
+        return
+    }
+
+    try {
+        Remove-Item -LiteralPath $VirtualEnvPath -Recurse -Force -ErrorAction Stop
+    }
+    catch {
+        Write-Warning "No pude borrar $VirtualEnvPath automaticamente. Cierra procesos que usen la venv y borralo manualmente si queres recrearla."
+        throw
+    }
+}
+
+$venvPython = Get-VenvPython -VirtualEnvPath $venvPath
 function Get-SystemPython {
     $candidates = @()
 
@@ -49,11 +89,14 @@ if (-not $systemPython) {
 
 if ($Install) {
     Write-Host "Preparando entorno virtual en $venvPath..."
-    & $systemPython -m venv --clear $venvPath
+    Remove-VenvSafely -VirtualEnvPath $venvPath
+    & $systemPython -m venv $venvPath
+    $venvPython = Get-VenvPython -VirtualEnvPath $venvPath
 }
 elseif (-not (Test-Path $venvPython)) {
     Write-Host "Creando entorno virtual en $venvPath..."
     & $systemPython -m venv $venvPath
+    $venvPython = Get-VenvPython -VirtualEnvPath $venvPath
 }
 
 if ($Install) {

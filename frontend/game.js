@@ -7,7 +7,10 @@ class HexGame {
         this.ringWidths = [1, 8, 8, 6]; // Larger map: Center, inner, middle, outer ring widths
         this.maxRadius = this.ringWidths.reduce((sum, width) => sum + width, 0) - 1;
         this.hexSize = 30; // Fixed hex size for consistent zoom
-        this.apiBaseUrl = CONFIG.API_BASE_URL;
+        this.apiBaseUrl = (window.CONFIG && window.CONFIG.API_BASE_URL)
+            ? window.CONFIG.API_BASE_URL
+            : this.resolveApiBaseUrl();
+        this.inventoryItems = [];
         this.eventCatalog = [
             { type: 'Combate', icon: '⚔️', color: '#e74c3c', probability: 0.16, message: '⚔️ Enemies close in. Time for a fight.' },
             { type: 'Jefe', icon: '👑', color: '#c0392b', probability: 0.05, message: '👑 A mighty boss blocks your path.' },
@@ -38,6 +41,7 @@ class HexGame {
         this.initializeGame();
         
         this.setupEventListeners();
+        this.setupInventoryEventListeners();
         this.setupChatEventListeners();
         this.gameLoop();
     }
@@ -203,6 +207,162 @@ class HexGame {
         window.addEventListener('resize', () => {
             this.canvas.width = window.innerWidth;
             this.canvas.height = window.innerHeight;
+        });
+    }
+
+    resolveApiBaseUrl() {
+        const configuredBaseUrl = document.body.dataset.apiBaseUrl;
+        if (configuredBaseUrl) {
+            return configuredBaseUrl.replace(/\/$/, '');
+        }
+
+        if (window.location.protocol === 'file:') {
+            return 'http://127.0.0.1:8000';
+        }
+
+        if (window.location.port === '8000') {
+            return window.location.origin;
+        }
+
+        return 'http://127.0.0.1:8000';
+    }
+
+    setupInventoryEventListeners() {
+        const inventoryButton = document.getElementById('inventoryButton');
+        const closeInventoryButton = document.getElementById('closeInventoryBtn');
+        const inventoryModal = document.getElementById('inventoryModal');
+
+        inventoryButton.addEventListener('click', () => {
+            this.openInventory();
+        });
+
+        closeInventoryButton.addEventListener('click', () => {
+            this.closeInventory();
+        });
+
+        inventoryModal.addEventListener('click', (event) => {
+            if (event.target === inventoryModal) {
+                this.closeInventory();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !inventoryModal.classList.contains('hidden')) {
+                this.closeInventory();
+            }
+        });
+    }
+
+    async openInventory() {
+        const inventoryModal = document.getElementById('inventoryModal');
+        inventoryModal.classList.remove('hidden');
+        await this.fetchInventory();
+    }
+
+    closeInventory() {
+        const inventoryModal = document.getElementById('inventoryModal');
+        inventoryModal.classList.add('hidden');
+    }
+
+    async fetchInventory() {
+        const inventoryStatus = document.getElementById('inventoryStatus');
+        const inventoryList = document.getElementById('inventoryList');
+
+        inventoryStatus.textContent = 'Cargando inventario...';
+        inventoryStatus.classList.remove('is-error');
+        inventoryList.innerHTML = '';
+
+        try {
+            const runResponse = await fetch(`${this.apiBaseUrl}/run/actual`);
+            if (runResponse.status === 404) {
+                inventoryStatus.textContent = 'No hay una run activa. Levanta el backend y crea una run antes de abrir el inventario.';
+                inventoryStatus.classList.remove('is-error');
+                return;
+            }
+
+            if (!runResponse.ok) {
+                throw new Error('No se pudo comprobar la run activa en el backend.');
+            }
+
+            const response = await fetch(`${this.apiBaseUrl}/inventario`);
+            const payload = await response.json().catch(() => null);
+
+            if (!response.ok) {
+                const detail = payload && payload.detail ? payload.detail : 'No se pudo cargar el inventario.';
+                throw new Error(detail);
+            }
+
+            this.inventoryItems = Array.isArray(payload) ? payload : [];
+            this.renderInventory(this.inventoryItems);
+        } catch (error) {
+            const message = error instanceof TypeError
+                ? `No se pudo conectar con el backend en ${this.apiBaseUrl}. Asegurate de levantar la API.`
+                : (error.message || 'No se pudo cargar el inventario.');
+            inventoryStatus.textContent = message;
+            inventoryStatus.classList.add('is-error');
+            inventoryList.innerHTML = '';
+        }
+    }
+
+    renderInventory(items) {
+        const inventoryStatus = document.getElementById('inventoryStatus');
+        const inventoryList = document.getElementById('inventoryList');
+
+        inventoryList.innerHTML = '';
+
+        if (!items.length) {
+            inventoryStatus.textContent = 'No tienes items en el inventario.';
+            inventoryStatus.classList.remove('is-error');
+            return;
+        }
+
+        inventoryStatus.textContent = `Objetos disponibles: ${items.length}`;
+        inventoryStatus.classList.remove('is-error');
+
+        items.forEach((item) => {
+            const card = document.createElement('article');
+            card.className = 'inventory-item';
+
+            const title = document.createElement('div');
+            title.className = 'inventory-item-title';
+
+            const name = document.createElement('div');
+            name.className = 'inventory-item-name';
+            name.textContent = item.nombre;
+
+            const quantity = document.createElement('div');
+            quantity.className = 'inventory-item-qty';
+            quantity.textContent = `x${item.cantidad}`;
+
+            title.appendChild(name);
+            title.appendChild(quantity);
+
+            const meta = document.createElement('div');
+            meta.className = 'inventory-item-meta';
+            const slotLabel = item.slot ? ` | Slot: ${item.slot}` : '';
+            meta.textContent = `${item.tipo}${slotLabel}`;
+
+            const description = document.createElement('div');
+            description.className = 'inventory-item-description';
+            description.textContent = item.descripcion;
+
+            const stats = document.createElement('div');
+            stats.className = 'inventory-item-stats';
+            stats.textContent = `STR ${item.bonus_fuerza} | CAR ${item.bonus_carisma} | DEX ${item.bonus_destreza}`;
+
+            card.appendChild(title);
+            card.appendChild(meta);
+            card.appendChild(description);
+            card.appendChild(stats);
+
+            if (item.efecto_tipo) {
+                const effect = document.createElement('div');
+                effect.className = 'inventory-item-stats';
+                effect.textContent = `Efecto: ${item.efecto_tipo} ${item.efecto_valor}`;
+                card.appendChild(effect);
+            }
+
+            inventoryList.appendChild(card);
         });
     }
 

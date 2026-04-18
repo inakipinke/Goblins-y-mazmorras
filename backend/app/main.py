@@ -3,7 +3,8 @@ from contextlib import asynccontextmanager
 from typing import Literal
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field, model_validator
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
 
 from app.db import (
     ConflictError,
@@ -40,12 +41,6 @@ class NewRunPayload(BaseModel):
 class EquipPayload(BaseModel):
     item_id: int | None = None
     item_code: str | None = None
-
-    @model_validator(mode="after")
-    def validate_identifier(self) -> "EquipPayload":
-        if (self.item_id is None) == (self.item_code is None):
-            raise ValueError("Debes enviar exactamente uno: item_id o item_code.")
-        return self
 
 
 class ItemReferencePayload(EquipPayload):
@@ -106,6 +101,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 def _translate_error(error: Exception) -> HTTPException:
     if isinstance(error, NotFoundError):
@@ -113,6 +116,14 @@ def _translate_error(error: Exception) -> HTTPException:
     if isinstance(error, ConflictError):
         return HTTPException(status_code=409, detail=str(error))
     return HTTPException(status_code=400, detail=str(error))
+
+
+def _validate_item_reference(payload: EquipPayload) -> None:
+    if (payload.item_id is None) == (payload.item_code is None):
+        raise HTTPException(
+            status_code=422,
+            detail="Debes enviar exactamente uno: item_id o item_code.",
+        )
 
 
 @app.get("/")
@@ -219,6 +230,7 @@ def get_equipped_items() -> list[dict[str, object]]:
 
 @app.post("/equipo/equipar")
 def equip(payload: EquipPayload) -> dict[str, object]:
+    _validate_item_reference(payload)
     try:
         return equip_item(item_id=payload.item_id, item_code=payload.item_code)
     except Exception as error:
@@ -235,6 +247,7 @@ def unequip(slot: str) -> dict[str, object]:
 
 @app.post("/inventario/loot")
 def loot(payload: LootPayload) -> dict[str, object]:
+    _validate_item_reference(payload)
     try:
         return add_loot(
             item_id=payload.item_id,
@@ -249,6 +262,7 @@ def loot(payload: LootPayload) -> dict[str, object]:
 
 @app.post("/inventario/usar")
 def consume_item(payload: ItemReferencePayload) -> dict[str, object]:
+    _validate_item_reference(payload)
     try:
         return use_item(item_id=payload.item_id, item_code=payload.item_code)
     except Exception as error:
