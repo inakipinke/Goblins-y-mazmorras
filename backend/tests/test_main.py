@@ -131,7 +131,8 @@ def test_unequip_returns_item_to_inventory(client: TestClient) -> None:
 
 def test_equip_replaces_existing_item_in_same_slot(client: TestClient) -> None:
     client.post("/run/nueva", json={"nombre": "Talco", "arquetipo": "romantico"})
-    client.post("/inventario/loot", json={"item_code": "amuleto_humedo", "cantidad": 2})
+    client.post("/inventario/loot", json={"item_code": "amuleto_humedo", "cantidad": 1})
+    client.post("/inventario/loot", json={"item_code": "fragmento_sagrado", "cantidad": 1})
 
     first_equip_response = client.post("/equipo/equipar", json={"item_code": "amuleto_humedo"})
     assert first_equip_response.status_code == 200
@@ -141,14 +142,14 @@ def test_equip_replaces_existing_item_in_same_slot(client: TestClient) -> None:
     assert primer_amuleto["bonus_vida"] == 4
     assert primer_amuleto["bonus_carisma"] == 6
 
-    second_equip_response = client.post("/equipo/equipar", json={"item_code": "amuleto_humedo"})
+    second_equip_response = client.post("/equipo/equipar", json={"item_code": "fragmento_sagrado"})
 
     assert second_equip_response.status_code == 200
     segundo_amuleto = second_equip_response.json()["equipo"][0]
-    assert segundo_amuleto["codigo"] == "amuleto_humedo"
+    assert segundo_amuleto["codigo"] == "fragmento_sagrado"
     assert segundo_amuleto["slot"] == "amuleto"
-    assert segundo_amuleto["bonus_vida"] == 4
-    assert segundo_amuleto["bonus_carisma"] == 6
+    assert segundo_amuleto["bonus_vida"] == 5
+    assert segundo_amuleto["bonus_carisma"] == 5
     amuleto = next(
         item for item in second_equip_response.json()["inventario"] if item["codigo"] == "amuleto_humedo"
     )
@@ -197,12 +198,42 @@ def test_loot_adds_items_to_inventory(client: TestClient) -> None:
 
     response = client.post(
         "/inventario/loot",
-        json={"item_code": "espada_oxidada", "cantidad": 2},
+        json={"item_code": "espada_oxidada", "cantidad": 1},
     )
 
     assert response.status_code == 200
     espada = next(item for item in response.json()["inventario"] if item["codigo"] == "espada_oxidada")
-    assert espada["cantidad"] == 2
+    assert espada["cantidad"] == 1
+
+
+def test_loot_rejects_duplicate_specific_item(client: TestClient) -> None:
+    client.post("/run/nueva", json={"nombre": "Looty", "arquetipo": "malo"})
+    client.post("/inventario/loot", json={"item_code": "espada_oxidada", "cantidad": 1})
+
+    response = client.post(
+        "/inventario/loot",
+        json={"item_code": "espada_oxidada", "cantidad": 1},
+    )
+
+    assert response.status_code == 409
+
+
+def test_random_loot_does_not_repeat_owned_items(client: TestClient) -> None:
+    client.post("/run/nueva", json={"nombre": "LootUnico", "arquetipo": "malo"})
+
+    first_response = client.post(
+        "/inventario/loot",
+        json={"nivel": 1, "cantidad": 1},
+    )
+    second_response = client.post(
+        "/inventario/loot",
+        json={"nivel": 1, "cantidad": 1},
+    )
+
+    assert first_response.status_code == 200
+    assert second_response.status_code == 200
+    assert first_response.json()["item"]["codigo"] != second_response.json()["item"]["codigo"]
+    assert all(item["cantidad"] == 1 for item in second_response.json()["inventario"])
 
 
 def test_random_loot_uses_requested_level(client: TestClient) -> None:

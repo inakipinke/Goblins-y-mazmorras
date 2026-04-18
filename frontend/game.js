@@ -1061,14 +1061,16 @@ class HexGame {
         try {
             if (result.passed && eventData.success) {
                 console.log('✅ Event succeeded! Applying success rewards...');
-                await this.applyEventEffects(eventData.success);
+                return await this.applyEventEffects(eventData.success);
             } else if (!result.passed && eventData.failure) {
                 console.log('❌ Event failed! Applying failure consequences...');
-                await this.applyEventEffects(eventData.failure);
+                return await this.applyEventEffects(eventData.failure);
             }
         } catch (error) {
             console.error('Failed to apply event consequences:', error);
         }
+
+        return null;
     }
 
     // Apply direct event effects (for events without options)
@@ -1096,6 +1098,9 @@ class HexGame {
     async applyEventEffects(effects) {
         try {
             let statsUpdated = false;
+            const rewardSummary = {
+                items: []
+            };
             
             // Apply damage
             if (effects.hp && effects.hp < 0) {
@@ -1147,11 +1152,17 @@ class HexGame {
             // Add loot
             if (effects.equipment && effects.equipment > 0) {
                 const zona = this.getZoneForCurrentPosition();
-                await this.apiCall('/inventario/loot', {
+                const lootResponse = await this.apiCall('/inventario/loot', {
                     method: 'POST',
                     body: JSON.stringify({ zona, cantidad: effects.equipment })
                 });
                 console.log(`🎁 Found ${effects.equipment} item(s) from zone ${zona}!`);
+                if (lootResponse && lootResponse.item) {
+                    rewardSummary.items.push({
+                        nombre: lootResponse.item.nombre,
+                        cantidad: lootResponse.cantidad || effects.equipment
+                    });
+                }
                 statsUpdated = true;
             }
             
@@ -1160,6 +1171,10 @@ class HexGame {
                 for (const item of effects.items) {
                     console.log(`🎁 Received: ${item}`);
                 }
+                rewardSummary.items.push(...effects.items.map((item) => ({
+                    nombre: item,
+                    cantidad: 1
+                })));
                 statsUpdated = true;
             }
             
@@ -1192,8 +1207,10 @@ class HexGame {
                 });
             }
             
+            return rewardSummary;
         } catch (error) {
             console.error('Failed to apply specific effect:', error);
+            return null;
         }
     }
 
@@ -1456,13 +1473,15 @@ class HexGame {
                 PLAYER_MESSAGE: message
             });
             
-            // Update requirement bars with bonuses
-            this.updateRequirementBarsWithBonuses(result);
-            
+            let rewardSummary = null;
+
             // Apply consequences to backend
             if (this.currentEventData && this.currentEventData.evento) {
-                await this.applyEventConsequences(result, this.currentEventData.evento);
+                rewardSummary = await this.applyEventConsequences(result, this.currentEventData.evento);
             }
+
+            // Update requirement bars with bonuses
+            this.updateRequirementBarsWithBonuses(result, rewardSummary);
             
             // Process result
             this.processEventResult(result);
@@ -1481,7 +1500,7 @@ class HexGame {
     }
 
     // Update requirement bars with bonuses from player action
-    updateRequirementBarsWithBonuses(result) {
+    updateRequirementBarsWithBonuses(result, rewardSummary = null) {
         const baseStats = this.currentGoblinStats;
         const requirements = this.currentRequirements;
         
@@ -1491,7 +1510,7 @@ class HexGame {
         }
         
         // Show bonus popup if any bonuses were gained
-        this.showBonusPopup(result);
+        this.showBonusPopup(result, rewardSummary);
         
         // Update bars with bonuses
         this.updateRequirementBar('strengthReq', 'Fuerza', 
@@ -1807,7 +1826,7 @@ class HexGame {
     }
 
     // Show bonus popup after player action
-    showBonusPopup(result) {
+    showBonusPopup(result, rewardSummary = null) {
         const bonuses = [];
         
         if (result.bonus_strength > 0) {
@@ -1822,6 +1841,17 @@ class HexGame {
         
         if (bonuses.length === 0) {
             bonuses.push('❌ Sin bonificaciones');
+        }
+        
+        if (rewardSummary && Array.isArray(rewardSummary.items)) {
+            rewardSummary.items.forEach((item) => {
+                const quantityLabel = item.cantidad && item.cantidad > 1 ? ` x${item.cantidad}` : '';
+                bonuses.push(`ðŸŽ ${item.nombre}${quantityLabel}`);
+            });
+        }
+        
+        if (bonuses.length === 0 && !(rewardSummary && Array.isArray(rewardSummary.items) && rewardSummary.items.length)) {
+            bonuses.push('Sin bonificaciones');
         }
         
         // Create popup element

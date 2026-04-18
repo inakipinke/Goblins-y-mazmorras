@@ -76,6 +76,7 @@ http://127.0.0.1:8000
 - La tabla `items` se carga automaticamente desde `items.json` en la raiz del repo.
 - El juego ya no usa items consumibles; todo el catalogo actual es equipable o de inventario permanente.
 - `POST /inventario/loot` ahora puede recibir un item especifico o generar uno aleatorio por `nivel` o `zona`.
+- El loot de una run ya no repite items: cada item puede obtenerse una sola vez por run, aunque despues se equipe o desequipe.
 - Cada run nueva arranca limpia: sin equipo, con vida base, con inventario vacio y sin eventos ya consumidos.
 - `POST /run/reset` ahora cierra la run activa y crea otra nueva al instante con el mismo nombre y arquetipo, pero reiniciada desde cero.
 - `POST /goblin/stats/asignar` modifica solo los stats base del goblin de la run activa; nunca toca el arquetipo original.
@@ -136,6 +137,8 @@ POST /inventario/loot
 }
 ```
 
+Si ese item ya fue obtenido en la run actual, la API responde `409`.
+
 ### Loot aleatorio por nivel
 
 ```json
@@ -145,6 +148,8 @@ POST /inventario/loot
   "cantidad": 1
 }
 ```
+
+El backend evita repetir items ya obtenidos en la run y nunca entrega mas de una copia del mismo item.
 
 ### Loot aleatorio por zona
 

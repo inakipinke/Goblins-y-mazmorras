@@ -860,12 +860,18 @@ def add_loot(
             raise NotFoundError("No hay una run activa. Crea una con POST /run/nueva.")
 
         item = None
+        loot_items: list[sqlite3.Row] = []
         target_level = nivel
 
         if item_id is not None or item_code is not None:
             item = _get_item_catalog(connection, item_id=item_id, item_code=item_code)
             if item is None:
                 raise NotFoundError("El item indicado no existe en el catalogo.")
+            if _goblin_already_has_item(connection, goblin["id"], item["id"]):
+                raise ConflictError("Ese item ya fue obtenido en esta run.")
+            if cantidad > 1:
+                raise ConflictError("No puedes recibir mas de una copia del mismo item.")
+            loot_items = [item]
         else:
             if zona is not None:
                 zone = connection.execute(
@@ -879,17 +885,20 @@ def add_loot(
             if target_level is None:
                 raise ConflictError("Debes enviar item_id, item_code, nivel o zona para generar el loot.")
 
-            item = _get_random_loot_item(connection, target_level)
-            if item is None:
+            loot_items = _get_random_loot_items(connection, goblin["id"], target_level, cantidad)
+            if not loot_items:
                 raise NotFoundError(f"No hay items disponibles para el nivel '{target_level}'.")
+            item = loot_items[0]
 
-        _add_inventory_quantity(connection, goblin["id"], item["id"], cantidad)
+        for loot_item in loot_items:
+            _add_inventory_quantity(connection, goblin["id"], loot_item["id"], 1)
         connection.commit()
 
     return {
         "message": "Loot agregado correctamente.",
         "item": dict(item),
-        "cantidad": cantidad,
+        "items": [dict(loot_item) for loot_item in loot_items],
+        "cantidad": len(loot_items),
         "inventario": list_inventory(),
     }
 
@@ -1378,7 +1387,12 @@ def _get_item_catalog(
     raise ConflictError("Debes enviar item_id o item_code.")
 
 
-def _get_random_loot_item(connection: sqlite3.Connection, nivel: int) -> sqlite3.Row | None:
+def _get_random_loot_items(
+    connection: sqlite3.Connection,
+    goblin_id: int,
+    nivel: int,
+    cantidad: int,
+) -> list[sqlite3.Row]:
     rows = connection.execute(
         """
         SELECT
@@ -1405,9 +1419,39 @@ def _get_random_loot_item(connection: sqlite3.Connection, nivel: int) -> sqlite3
     ).fetchall()
 
     if not rows:
-        return None
+        return []
 
-    return random.choice(rows)
+    owned_item_ids = _get_owned_item_ids(connection, goblin_id)
+    available_rows = [row for row in rows if row["id"] not in owned_item_ids]
+    if not available_rows:
+        return []
+
+    selected_count = min(cantidad, len(available_rows))
+    return random.sample(available_rows, k=selected_count)
+
+
+def _get_owned_item_ids(connection: sqlite3.Connection, goblin_id: int) -> set[int]:
+    inventory_rows = connection.execute(
+        """
+        SELECT item_id
+        FROM inventario
+        WHERE goblin_id = ?
+        """,
+        (goblin_id,),
+    ).fetchall()
+    equipment_rows = connection.execute(
+        """
+        SELECT item_id
+        FROM equipo
+        WHERE goblin_id = ?
+        """,
+        (goblin_id,),
+    ).fetchall()
+    return {row["item_id"] for row in inventory_rows + equipment_rows}
+
+
+def _goblin_already_has_item(connection: sqlite3.Connection, goblin_id: int, item_id: int) -> bool:
+    return item_id in _get_owned_item_ids(connection, goblin_id)
 
 
 def _remove_inventory_quantity(
