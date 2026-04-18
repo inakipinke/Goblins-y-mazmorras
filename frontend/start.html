@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goblins y Mazmorras | Start</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Uncial+Antiqua&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="start-screen">
+    <main class="start-shell">
+        <section class="start-hero">
+            <p class="start-kicker">Roguelike Goblin Adventure</p>
+            <h1 class="start-title">Choose Your Goblin</h1>
+            <p class="start-copy">
+                Start a new run by choosing the goblin that will enter the maze.
+                The selection uses the backend API and opens the main board as soon as the run is created.
+            </p>
+        </section>
+
+        <section class="start-panel">
+            <div class="start-panel-header">
+                <h2 class="start-panel-title">New Run</h2>
+                <p class="start-panel-subtitle">Pick one of the three archetypes and send your goblin into the dungeon.</p>
+            </div>
+
+            <label class="start-label" for="goblinName">Goblin Name</label>
+            <input id="goblinName" class="start-input" type="text" maxlength="40" value="Berto" placeholder="Berto">
+
+            <div class="character-grid">
+                <button class="character-card" type="button" data-archetype="malo">
+                    <img class="character-art" src="../src/GoblinMalo.webp" alt="Goblin Malo">
+                    <span class="character-badge">STR</span>
+                    <h3 class="character-name">Goblin Malo</h3>
+                    <p class="character-tagline">Brute force and blunt solutions.</p>
+                    <p class="character-stats">High strength. Built to hit first.</p>
+                </button>
+
+                <button class="character-card" type="button" data-archetype="romantico">
+                    <img class="character-art" src="../src/GoblinRomantico.webp" alt="Goblin Romantico">
+                    <span class="character-badge">CHA</span>
+                    <h3 class="character-name">Goblin Romantico</h3>
+                    <p class="character-tagline">Charm, audacity, and a suspicious smile.</p>
+                    <p class="character-stats">High charisma. Wins with words and style.</p>
+                </button>
+
+                <button class="character-card" type="button" data-archetype="rayo_mcqueen">
+                    <img class="character-art" src="../src/GoblinMcQueen.webp" alt="Goblin McQueen">
+                    <span class="character-badge">DEX</span>
+                    <h3 class="character-name">Goblin McQueen</h3>
+                    <p class="character-tagline">Fast feet, sharp reflexes, zero brakes.</p>
+                    <p class="character-stats">High dexterity. Perfect for speed and evasion.</p>
+                </button>
+            </div>
+
+            <div id="startStatus" class="start-status" aria-live="polite">
+                The backend must be running on <code>http://127.0.0.1:8000</code>.
+            </div>
+        </section>
+    </main>
+
+    <div class="medieval-border top"></div>
+    <div class="medieval-border bottom"></div>
+    <div class="medieval-border left"></div>
+    <div class="medieval-border right"></div>
+
+    <script src="start.js"></script>
+</body>
+</html>

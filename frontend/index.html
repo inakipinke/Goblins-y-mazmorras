@@ -49,9 +49,22 @@
                 <button id="newRunBtn" class="new-run-btn">Nueva Partida</button>
             </div>
         </div>
+
+        <button id="inventoryButton" class="inventory-button" type="button">Inventario</button>
     </div>
     
     <canvas id="gameCanvas"></canvas>
+
+    <div id="inventoryModal" class="inventory-modal hidden">
+        <div class="inventory-panel">
+            <div class="inventory-header">
+                <h3>Inventario</h3>
+                <button id="closeInventoryBtn" class="close-btn" type="button">×</button>
+            </div>
+            <div id="inventoryStatus" class="inventory-status">Cargando inventario...</div>
+            <div id="inventoryList" class="inventory-list"></div>
+        </div>
+    </div>
     
     <!-- Event Chat Modal -->
     <div id="eventChatModal" class="chat-modal hidden">

@@ -14,6 +14,10 @@ body {
     color: #d4af37;
 }
 
+body.start-screen {
+    overflow: auto;
+}
+
 /* Parchment texture overlay */
 body::before {
     content: '';
@@ -212,6 +216,20 @@ body::before {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .start-shell {
+        grid-template-columns: 1fr;
+        padding: 32px 18px 48px;
+    }
+
+    .start-hero,
+    .start-panel {
+        padding: 24px;
+    }
+
+    .character-grid {
+        grid-template-columns: 1fr;
+    }
+
     .game-title {
         font-size: 1.8rem;
     }
@@ -227,9 +245,26 @@ body::before {
         left: 20px;
         width: auto;
     }
+
+    .inventory-button {
+        top: auto;
+        bottom: 132px;
+        left: 20px;
+    }
     
     .info-panel {
         padding: 12px;
+    }
+
+    .inventory-modal {
+        justify-content: center;
+        align-items: flex-end;
+        padding: 16px;
+    }
+
+    .inventory-panel {
+        width: 100%;
+        max-height: 72vh;
     }
 }
 
@@ -584,6 +619,7 @@ body::before {
     #chatInput {
         font-size: 16px; /* Prevent zoom on iOS */
     }
+<<<<<<< HEAD
     
     .stats-row {
         flex-direction: column;
@@ -633,3 +669,6 @@ body::before {
     cursor: not-allowed;
     transform: none;
 }
+=======
+}
+>>>>>>> 07ff8960907b222073757045b4a65f360ba4423e
