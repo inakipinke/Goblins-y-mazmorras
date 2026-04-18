@@ -7,6 +7,18 @@ class HexGame {
         this.ringWidths = [1, 8, 8, 6]; // Larger map: Center, inner, middle, outer ring widths
         this.maxRadius = this.ringWidths.reduce((sum, width) => sum + width, 0) - 1;
         this.hexSize = 30; // Fixed hex size for consistent zoom
+        this.eventCatalog = [
+            { type: 'Combate', icon: '⚔️', color: '#e74c3c', probability: 0.16, message: '⚔️ Enemies close in. Time for a fight.' },
+            { type: 'Jefe', icon: '👑', color: '#c0392b', probability: 0.05, message: '👑 A mighty boss blocks your path.' },
+            { type: 'Encuentro', icon: '🤝', color: '#1abc9c', probability: 0.12, message: '🤝 Someone awaits a decision, bargain, or act of mercy.' },
+            { type: 'Trampa', icon: '🕳️', color: '#8e44ad', probability: 0.1, message: '🕳️ A trap springs from the terrain.' },
+            { type: 'Comerciante', icon: '💰', color: '#f1c40f', probability: 0.1, message: '💰 A merchant offers goods, deals, and temptation.' },
+            { type: 'Objeto misterioso', icon: '✨', color: '#3498db', probability: 0.11, message: '✨ A strange object hums with unpredictable magic.' },
+            { type: 'Santuario', icon: '⛪', color: '#ecf0f1', probability: 0.08, message: '⛪ Sacred energy offers rest or blessing.' },
+            { type: 'Entrenamiento', icon: '🏋️', color: '#e67e22', probability: 0.08, message: '🏋️ A chance to train and grow stronger appears.' },
+            { type: 'Exploración', icon: '🗺️', color: '#2ecc71', probability: 0.1, message: '🗺️ Ruins and secrets invite exploration.' },
+            { type: 'Social', icon: '🎭', color: '#fd79a8', probability: 0.1, message: '🎭 This moment will be won with presence and charisma.' }
+        ];
         this.hexMap = this.generateCircularMap();
         this.tileStates = new Map();
         
@@ -106,18 +118,10 @@ class HexGame {
     }
 
     generateRandomEvent() {
-        const eventTypes = [
-            { type: 'empty', probability: 0.4 },
-            { type: 'treasure', probability: 0.2 },
-            { type: 'combat', probability: 0.2 },
-            { type: 'trap', probability: 0.15 },
-            { type: 'mystery', probability: 0.05 }
-        ];
-        
         const random = Math.random();
         let cumulative = 0;
         
-        for (let eventType of eventTypes) {
+        for (let eventType of this.eventCatalog) {
             cumulative += eventType.probability;
             if (random <= cumulative) {
                 return {
@@ -127,7 +131,14 @@ class HexGame {
             }
         }
         
-        return { type: 'empty', triggered: false };
+        return {
+            type: this.eventCatalog[this.eventCatalog.length - 1].type,
+            triggered: false
+        };
+    }
+
+    getEventConfig(eventType) {
+        return this.eventCatalog.find(event => event.type === eventType) || null;
     }
 
     revealAdjacentTiles(q, r) {
@@ -328,6 +339,9 @@ class HexGame {
 
     // Draw event indicators on tiles
     drawEventIndicator(x, y, eventType, triggered) {
+        const eventConfig = this.getEventConfig(eventType);
+        if (!eventConfig) return;
+
         const size = this.hexSize * 0.58;
         const iconY = y - this.hexSize * 0.08;
 
@@ -341,24 +355,15 @@ class HexGame {
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         
-        let symbol, color;
-        switch(eventType) {
-            case 'treasure': symbol = '💰'; color = '#f1c40f'; break;
-            case 'combat': symbol = '⚔️'; color = '#e74c3c'; break;
-            case 'trap': symbol = '🕳️'; color = '#8e44ad'; break;
-            case 'mystery': symbol = '✨'; color = '#3498db'; break;
-            default: return;
-        }
-        
         if (triggered) {
             this.ctx.globalAlpha = 0.5;
         }
         
-        this.ctx.fillStyle = color;
+        this.ctx.fillStyle = eventConfig.color;
         this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
         this.ctx.lineWidth = 3;
-        this.ctx.strokeText(symbol, x, iconY);
-        this.ctx.fillText(symbol, x, iconY);
+        this.ctx.strokeText(eventConfig.icon, x, iconY);
+        this.ctx.fillText(eventConfig.icon, x, iconY);
         this.ctx.globalAlpha = 1;
     }
 
@@ -574,23 +579,10 @@ class HexGame {
         if (!tile.event || tile.event.triggered) return;
         
         tile.event.triggered = true;
-        
-        switch(tile.event.type) {
-            case 'treasure':
-                console.log('💰 You found treasure! Gold coins glitter in the hex.');
-                break;
-            case 'combat':
-                console.log('⚔️ A wild creature appears! Prepare for battle!');
-                break;
-            case 'trap':
-                console.log('🕳️ You triggered a trap! Watch your step, goblin.');
-                break;
-            case 'mystery':
-                console.log('✨ Strange magical energy emanates from this hex...');
-                break;
-            case 'empty':
-                console.log('🍃 Nothing here but empty ground.');
-                break;
+
+        const eventConfig = this.getEventConfig(tile.event.type);
+        if (eventConfig) {
+            console.log(eventConfig.message);
         }
     }
 
@@ -661,7 +653,7 @@ class HexGame {
             this.drawHex(pixel.x, pixel.y, color, alpha);
             
             // Draw event indicator for discovered/visited tiles (show events on discovered tiles too)
-            if (tile.state !== 'hidden' && tile.event.type !== 'empty') {
+            if (tile.state !== 'hidden') {
                 this.drawEventIndicator(pixel.x, pixel.y, tile.event.type, tile.event.triggered);
             }
             
