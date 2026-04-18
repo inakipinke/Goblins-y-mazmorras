@@ -27,6 +27,7 @@ class HexGame {
         this.tileStates = new Map();
         this.currentEvent = null;
         this.currentEventData = null;
+        this.isEventPending = false;
         
         // Camera/viewport system
         this.camera = {
@@ -667,7 +668,7 @@ class HexGame {
     setupEventListeners() {
         // Mouse click for movement
         this.canvas.addEventListener('click', (e) => {
-            if (this.camera.isDragging) return; // Don't move if we were dragging
+            if (this.camera.isDragging || this.isEventPending || this.currentEvent) return; // Don't move if dragging or an event is active
             
             const rect = this.canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -725,6 +726,10 @@ class HexGame {
 
     // Try to move goblin to target hex (only if adjacent and discovered)
     tryMoveGoblin(targetQ, targetR) {
+        if (this.isEventPending || this.currentEvent) {
+            return;
+        }
+
         const targetKey = `${targetQ},${targetR}`;
         const targetTile = this.tileStates.get(targetKey);
         
@@ -769,15 +774,23 @@ class HexGame {
     }
 
     triggerTileEvent(tile) {
-        if (!tile.event || tile.event.triggered) return;
+        if (!tile.event || tile.event.triggered || this.isEventPending || this.currentEvent) return;
         
+        this.isEventPending = true;
         tile.event.triggered = true;
 
         const eventConfig = this.getEventConfig(tile.event.type);
         if (eventConfig) {
             console.log(eventConfig.message);
             // Open chat modal for interactive events
-            this.openEventChat(tile.event);
+            this.openEventChat(tile.event).catch((error) => {
+                console.error('Failed to open event chat:', error);
+                this.isEventPending = false;
+                this.currentEvent = null;
+                this.currentEventData = null;
+            });
+        } else {
+            this.isEventPending = false;
         }
     }
 
@@ -899,22 +912,27 @@ class HexGame {
         // Clear previous messages
         messagesContainer.innerHTML = '';
         chatInput.value = '';
-        loadingDiv.classList.add('hidden');
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+        loadingDiv.classList.remove('hidden');
         
         // Store current event
         this.currentEvent = event;
+        this.currentEventData = null;
+
+        // Show modal immediately so additional clicks are blocked and the player gets instant feedback.
+        modal.classList.remove('hidden');
         
         // Try to consume event from backend
         const zona = this.getZoneForCurrentPosition();
         this.currentEventData = await this.consumeEvent(zona, event.type);
-        
-        // Show modal
-        modal.classList.remove('hidden');
-        
+
         // Generate initial event description using AI
-        this.generateEventDescription(event);
+        await this.generateEventDescription(event);
         
         // Focus input
+        chatInput.disabled = false;
+        sendBtn.disabled = false;
         setTimeout(() => chatInput.focus(), 100);
     }
 
@@ -1209,6 +1227,8 @@ class HexGame {
         const modal = document.getElementById('eventChatModal');
         modal.classList.add('hidden');
         this.currentEvent = null;
+        this.currentEventData = null;
+        this.isEventPending = false;
     }
 
     // Setup chat event listeners
