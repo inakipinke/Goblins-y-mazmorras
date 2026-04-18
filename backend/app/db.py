@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import sqlite3
 from pathlib import Path
@@ -7,31 +8,53 @@ from typing import Any
 
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "goblins.db"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+ZONE_SOURCES = (
+    {
+        "codigo": "inicial",
+        "nombre": "Zona Inicial",
+        "archivo": "eventos.json",
+        "nivel": 1,
+    },
+    {
+        "codigo": "ciudad",
+        "nombre": "Ciudad",
+        "archivo": "eventos2.json",
+        "nivel": 2,
+    },
+    {
+        "codigo": "castillo",
+        "nombre": "Castillo",
+        "archivo": "eventos3.json",
+        "nivel": 3,
+    },
+)
 
 ARCHETYPES = (
     {
         "codigo": "romantico",
         "nombre": "Goblin Romantico",
         "descripcion": "Tiene mas carisma que verguenza.",
-        "fuerza_base": 2,
-        "carisma_base": 5,
-        "destreza_base": 3,
+        "fuerza_base":8,
+        "carisma_base": 15,
+        "destreza_base": 12,
     },
     {
         "codigo": "malo",
         "nombre": "Goblin Malo",
         "descripcion": "Resuelve todo a los golpes.",
-        "fuerza_base": 5,
-        "carisma_base": 2,
-        "destreza_base": 3,
+        "fuerza_base": 15,
+        "carisma_base": 8,
+        "destreza_base": 12,
     },
     {
         "codigo": "rayo_mcqueen",
         "nombre": "Goblin Rayo McQueen",
         "descripcion": "No piensa, acelera.",
-        "fuerza_base": 2,
-        "carisma_base": 3,
-        "destreza_base": 5,
+        "fuerza_base": 12,
+        "carisma_base": 8,
+        "destreza_base": 15,
     },
 )
 
@@ -104,10 +127,6 @@ ITEMS = (
 )
 
 STARTER_LOADOUT = (
-    ("garrote_astillado", 1),
-    ("rosa_robada", 1),
-    ("botas_chispeantes", 1),
-    ("chaleco_remendado", 1),
     ("venda_sucia", 3),
 )
 
@@ -172,8 +191,8 @@ def init_db() -> None:
                 fuerza_base INTEGER NOT NULL,
                 carisma_base INTEGER NOT NULL,
                 destreza_base INTEGER NOT NULL,
-                vida_actual INTEGER NOT NULL DEFAULT 10,
-                vida_max INTEGER NOT NULL DEFAULT 10,
+                vida_actual INTEGER NOT NULL DEFAULT 100,
+                vida_max INTEGER NOT NULL DEFAULT 100,
                 oro INTEGER NOT NULL DEFAULT 0,
                 esta_vivo INTEGER NOT NULL DEFAULT 1,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -216,11 +235,55 @@ def init_db() -> None:
                 FOREIGN KEY (goblin_id) REFERENCES goblin(id) ON DELETE CASCADE,
                 FOREIGN KEY (item_id) REFERENCES items(id)
             );
+
+            CREATE TABLE IF NOT EXISTS zonas (
+                codigo TEXT PRIMARY KEY,
+                nombre TEXT NOT NULL,
+                archivo TEXT NOT NULL UNIQUE,
+                nivel INTEGER NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS tipos_evento (
+                tipo TEXT PRIMARY KEY,
+                descripcion TEXT NOT NULL,
+                includes_json TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS eventos (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                zona_codigo TEXT NOT NULL,
+                nivel INTEGER NOT NULL,
+                source_index INTEGER NOT NULL,
+                nombre TEXT NOT NULL,
+                tipo TEXT NOT NULL,
+                descripcion TEXT,
+                options_json TEXT,
+                effect_json TEXT,
+                success_json TEXT,
+                failure_json TEXT,
+                raw_json TEXT NOT NULL,
+                UNIQUE(zona_codigo, source_index),
+                FOREIGN KEY (zona_codigo) REFERENCES zonas(codigo),
+                FOREIGN KEY (tipo) REFERENCES tipos_evento(tipo)
+            );
+
+            CREATE TABLE IF NOT EXISTS run_eventos_usados (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                run_id INTEGER NOT NULL,
+                evento_id INTEGER NOT NULL,
+                used_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(run_id, evento_id),
+                FOREIGN KEY (run_id) REFERENCES runs(id) ON DELETE CASCADE,
+                FOREIGN KEY (evento_id) REFERENCES eventos(id)
+            );
             """
         )
         _ensure_items_columns(connection)
         _seed_archetypes(connection)
         _seed_items(connection)
+        _seed_zones(connection)
+        _seed_event_types(connection)
+        _seed_events(connection)
         connection.commit()
 
 
@@ -279,6 +342,118 @@ def _seed_items(connection: sqlite3.Connection) -> None:
     )
 
 
+def _seed_zones(connection: sqlite3.Connection) -> None:
+    connection.executemany(
+        """
+        INSERT INTO zonas (codigo, nombre, archivo, nivel)
+        VALUES (:codigo, :nombre, :archivo, :nivel)
+        ON CONFLICT(codigo) DO UPDATE SET
+            nombre = excluded.nombre,
+            archivo = excluded.archivo,
+            nivel = excluded.nivel
+        """,
+        ZONE_SOURCES,
+    )
+
+
+def _seed_event_types(connection: sqlite3.Connection) -> None:
+    data = _load_json_file("tiposeventos.json")
+    payload = [
+        {
+            "tipo": entry["type"],
+            "descripcion": entry["description"],
+            "includes_json": json.dumps(entry.get("includes", []), ensure_ascii=False),
+        }
+        for entry in data["eventTypes"]
+    ]
+
+    connection.executemany(
+        """
+        INSERT INTO tipos_evento (tipo, descripcion, includes_json)
+        VALUES (:tipo, :descripcion, :includes_json)
+        ON CONFLICT(tipo) DO UPDATE SET
+            descripcion = excluded.descripcion,
+            includes_json = excluded.includes_json
+        """,
+        payload,
+    )
+
+
+def _seed_events(connection: sqlite3.Connection) -> None:
+    payload = []
+    for zone in ZONE_SOURCES:
+        data = _load_json_file(zone["archivo"])
+        level = data.get("level", zone["nivel"])
+        for index, event in enumerate(data["events"], start=1):
+            payload.append(
+                {
+                    "zona_codigo": zone["codigo"],
+                    "nivel": level,
+                    "source_index": index,
+                    "nombre": event["name"],
+                    "tipo": event["type"],
+                    "descripcion": event.get("description"),
+                    "options_json": _dump_json_or_none(event.get("options")),
+                    "effect_json": _dump_json_or_none(event.get("effect")),
+                    "success_json": _dump_json_or_none(event.get("success")),
+                    "failure_json": _dump_json_or_none(event.get("failure")),
+                    "raw_json": json.dumps(event, ensure_ascii=False),
+                }
+            )
+
+    connection.executemany(
+        """
+        INSERT INTO eventos (
+            zona_codigo,
+            nivel,
+            source_index,
+            nombre,
+            tipo,
+            descripcion,
+            options_json,
+            effect_json,
+            success_json,
+            failure_json,
+            raw_json
+        ) VALUES (
+            :zona_codigo,
+            :nivel,
+            :source_index,
+            :nombre,
+            :tipo,
+            :descripcion,
+            :options_json,
+            :effect_json,
+            :success_json,
+            :failure_json,
+            :raw_json
+        )
+        ON CONFLICT(zona_codigo, source_index) DO UPDATE SET
+            nivel = excluded.nivel,
+            nombre = excluded.nombre,
+            tipo = excluded.tipo,
+            descripcion = excluded.descripcion,
+            options_json = excluded.options_json,
+            effect_json = excluded.effect_json,
+            success_json = excluded.success_json,
+            failure_json = excluded.failure_json,
+            raw_json = excluded.raw_json
+        """,
+        payload,
+    )
+
+
+def _load_json_file(filename: str) -> dict[str, Any]:
+    with (REPO_ROOT / filename).open("r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def _dump_json_or_none(value: Any) -> str | None:
+    if value is None:
+        return None
+    return json.dumps(value, ensure_ascii=False)
+
+
 def _row_to_dict(row: sqlite3.Row | None) -> dict[str, Any] | None:
     if row is None:
         return None
@@ -321,6 +496,37 @@ def list_items() -> list[dict[str, Any]]:
         ).fetchall()
 
     return [dict(row) for row in rows]
+
+
+def list_zones() -> list[dict[str, Any]]:
+    with get_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT codigo, nombre, archivo, nivel
+            FROM zonas
+            ORDER BY nivel
+            """
+        ).fetchall()
+
+    return [dict(row) for row in rows]
+
+
+def list_event_types() -> list[dict[str, Any]]:
+    with get_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT tipo, descripcion, includes_json
+            FROM tipos_evento
+            ORDER BY tipo
+            """
+        ).fetchall()
+
+    payload = []
+    for row in rows:
+        event_type = dict(row)
+        event_type["includes"] = json.loads(event_type.pop("includes_json"))
+        payload.append(event_type)
+    return payload
 
 
 def get_active_run() -> dict[str, Any] | None:
@@ -432,6 +638,71 @@ def list_equipment() -> list[dict[str, Any]]:
     return [dict(row) for row in rows]
 
 
+def consume_event(zona_codigo: str, tipo_evento: str) -> dict[str, Any]:
+    with get_connection() as connection:
+        goblin = _get_active_goblin(connection)
+        if goblin is None:
+            raise NotFoundError("No hay una run activa. Crea una con POST /run/nueva.")
+
+        zone = connection.execute(
+            "SELECT codigo FROM zonas WHERE codigo = ?",
+            (zona_codigo,),
+        ).fetchone()
+        if zone is None:
+            raise NotFoundError(f"La zona '{zona_codigo}' no existe.")
+
+        event_type = connection.execute(
+            "SELECT tipo FROM tipos_evento WHERE tipo = ?",
+            (tipo_evento,),
+        ).fetchone()
+        if event_type is None:
+            raise NotFoundError(f"El tipo de evento '{tipo_evento}' no existe.")
+
+        event = connection.execute(
+            """
+            SELECT
+                e.id,
+                e.zona_codigo,
+                e.nivel,
+                e.source_index,
+                e.nombre,
+                e.tipo,
+                e.descripcion,
+                e.options_json,
+                e.effect_json,
+                e.success_json,
+                e.failure_json,
+                e.raw_json
+            FROM eventos e
+            LEFT JOIN run_eventos_usados reu
+                ON reu.evento_id = e.id
+               AND reu.run_id = ?
+            WHERE e.zona_codigo = ?
+              AND e.tipo = ?
+              AND reu.id IS NULL
+            ORDER BY e.source_index
+            LIMIT 1
+            """,
+            (goblin["run_id"], zona_codigo, tipo_evento),
+        ).fetchone()
+
+        if event is None:
+            raise ConflictError(
+                f"No quedan eventos sin usar para la zona '{zona_codigo}' y el tipo '{tipo_evento}' en esta run."
+            )
+
+        connection.execute(
+            """
+            INSERT INTO run_eventos_usados (run_id, evento_id)
+            VALUES (?, ?)
+            """,
+            (goblin["run_id"], event["id"]),
+        )
+        connection.commit()
+
+    return _hydrate_event_row(event)
+
+
 def start_new_run(nombre: str, arquetipo_codigo: str) -> dict[str, Any]:
     with get_connection() as connection:
         archetype = connection.execute(
@@ -476,7 +747,7 @@ def start_new_run(nombre: str, arquetipo_codigo: str) -> dict[str, Any]:
                 vida_max,
                 oro,
                 esta_vivo
-            ) VALUES (?, ?, ?, ?, ?, ?, 10, 10, 0, 1)
+            ) VALUES (?, ?, ?, ?, ?, ?, 100, 100, 0, 1)
             """,
             (
                 run_id,
@@ -657,6 +928,38 @@ def mark_defeat() -> dict[str, Any]:
         "run_id": goblin["run_id"],
         "estado": "defeated",
     }
+
+
+def get_used_events_for_active_run() -> list[dict[str, Any]]:
+    with get_connection() as connection:
+        goblin = _get_active_goblin(connection)
+        if goblin is None:
+            raise NotFoundError("No hay una run activa. Crea una con POST /run/nueva.")
+
+        rows = connection.execute(
+            """
+            SELECT
+                e.id,
+                e.zona_codigo,
+                e.nivel,
+                e.source_index,
+                e.nombre,
+                e.tipo,
+                e.descripcion,
+                e.options_json,
+                e.effect_json,
+                e.success_json,
+                e.failure_json,
+                e.raw_json
+            FROM run_eventos_usados reu
+            JOIN eventos e ON e.id = reu.evento_id
+            WHERE reu.run_id = ?
+            ORDER BY reu.used_at, e.source_index
+            """,
+            (goblin["run_id"],),
+        ).fetchall()
+
+    return [_hydrate_event_row(row) for row in rows]
 
 
 def equip_item(*, item_id: int | None = None, item_code: str | None = None) -> dict[str, Any]:
@@ -845,6 +1148,23 @@ def _get_inventory_item(
         ).fetchone()
 
     raise ConflictError("Debes enviar item_id o item_code.")
+
+
+def _hydrate_event_row(row: sqlite3.Row) -> dict[str, Any]:
+    return {
+        "id": row["id"],
+        "zona": row["zona_codigo"],
+        "nivel": row["nivel"],
+        "indice": row["source_index"],
+        "nombre": row["nombre"],
+        "tipo": row["tipo"],
+        "descripcion": row["descripcion"],
+        "options": json.loads(row["options_json"]) if row["options_json"] else None,
+        "effect": json.loads(row["effect_json"]) if row["effect_json"] else None,
+        "success": json.loads(row["success_json"]) if row["success_json"] else None,
+        "failure": json.loads(row["failure_json"]) if row["failure_json"] else None,
+        "raw": json.loads(row["raw_json"]),
+    }
 
 
 def _add_inventory_quantity(

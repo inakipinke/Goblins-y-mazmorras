@@ -8,15 +8,19 @@ from app.db import (
     NotFoundError,
     add_loot,
     apply_damage,
+    consume_event,
     equip_item,
     get_db_path,
     get_goblin_snapshot,
     get_active_run,
+    get_used_events_for_active_run,
     init_db,
     list_archetypes,
     list_equipment,
+    list_event_types,
     list_inventory,
     list_items,
+    list_zones,
     mark_defeat,
     reset_run,
     start_new_run,
@@ -51,6 +55,11 @@ class LootPayload(ItemReferencePayload):
 
 class DamagePayload(BaseModel):
     cantidad: int = Field(ge=1)
+
+
+class ConsumeEventPayload(BaseModel):
+    zona: str = Field(min_length=1)
+    tipo: str = Field(min_length=1)
 
 
 @asynccontextmanager
@@ -104,6 +113,16 @@ def get_items() -> list[dict[str, object]]:
     return list_items()
 
 
+@app.get("/zonas")
+def get_zonas() -> list[dict[str, object]]:
+    return list_zones()
+
+
+@app.get("/eventos/tipos")
+def get_tipos_evento() -> list[dict[str, object]]:
+    return list_event_types()
+
+
 @app.get("/run/actual")
 def get_current_run() -> dict[str, object]:
     run = get_active_run()
@@ -147,6 +166,14 @@ def get_goblin() -> dict[str, object]:
 def get_inventory() -> list[dict[str, object]]:
     try:
         return list_inventory()
+    except Exception as error:
+        raise _translate_error(error) from error
+
+
+@app.get("/eventos/usados")
+def get_used_events() -> list[dict[str, object]]:
+    try:
+        return get_used_events_for_active_run()
     except Exception as error:
         raise _translate_error(error) from error
 
@@ -209,3 +236,19 @@ def defeat_run() -> dict[str, object]:
         return mark_defeat()
     except Exception as error:
         raise _translate_error(error) from error
+
+
+@app.post("/eventos/consumir")
+def draw_event(payload: ConsumeEventPayload) -> dict[str, object]:
+    try:
+        event = consume_event(
+            zona_codigo=payload.zona.strip(),
+            tipo_evento=payload.tipo.strip(),
+        )
+    except Exception as error:
+        raise _translate_error(error) from error
+
+    return {
+        "message": "Evento consumido correctamente.",
+        "evento": event,
+    }

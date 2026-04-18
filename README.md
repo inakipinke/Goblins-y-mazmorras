@@ -16,6 +16,10 @@ Las tablas principales son:
 - `items`
 - `inventario`
 - `equipo`
+- `zonas`
+- `tipos_evento`
+- `eventos`
+- `run_eventos_usados`
 
 ### Arranque rapido en Windows
 
@@ -41,11 +45,15 @@ Usa `.\backend\start.ps1` sin `-Install` si solo queres volver a levantarlo usan
 - `GET /health`
 - `GET /arquetipos`
 - `GET /items`
+- `GET /zonas`
+- `GET /eventos/tipos`
 - `GET /run/actual`
 - `POST /run/nueva`
 - `POST /run/reset`
 - `GET /goblin`
 - `GET /inventario`
+- `GET /eventos/usados`
+- `POST /eventos/consumir`
 - `POST /inventario/loot`
 - `POST /inventario/usar`
 - `GET /equipo`
@@ -71,6 +79,27 @@ Usa `.\backend\start.ps1` sin `-Install` si solo queres volver a levantarlo usan
 6. `POST /goblin/recibir-dano` durante combate
 7. `POST /inventario/usar` para consumibles
 8. `POST /run/derrota` o `POST /run/reset` cuando el jugador pierde
+
+### Eventos hexagonales
+
+Los eventos de mapa se cargan automaticamente desde los JSON del repo:
+
+- `eventos.json` para la zona `inicial`
+- `eventos2.json` para la zona `ciudad`
+- `eventos3.json` para la zona `castillo`
+- `tiposeventos.json` para las definiciones de tipos
+
+Cuando el frontend detecta que el jugador pisa una casilla, puede consumir un evento no repetido de esa zona y ese tipo:
+
+```json
+POST /eventos/consumir
+{
+  "zona": "inicial",
+  "tipo": "Combate"
+}
+```
+
+La API devuelve un evento no usado para la run actual y lo marca inmediatamente como consumido para que no vuelva a salir en esa misma partida.
 
 ### Tests
 
