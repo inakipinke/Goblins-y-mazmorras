@@ -328,7 +328,15 @@ class HexGame {
 
     // Draw event indicators on tiles
     drawEventIndicator(x, y, eventType, triggered) {
-        const size = this.hexSize * 0.3;
+        const size = this.hexSize * 0.58;
+        const iconY = y - this.hexSize * 0.08;
+
+        // Add a dark badge so the icon stays recognizable against any tile color.
+        this.ctx.beginPath();
+        this.ctx.arc(x, iconY, this.hexSize * 0.34, 0, Math.PI * 2);
+        this.ctx.fillStyle = triggered ? 'rgba(20, 20, 20, 0.4)' : 'rgba(20, 20, 20, 0.65)';
+        this.ctx.fill();
+
         this.ctx.font = `${size}px Arial`;
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
@@ -347,7 +355,10 @@ class HexGame {
         }
         
         this.ctx.fillStyle = color;
-        this.ctx.fillText(symbol, x, y - this.hexSize * 0.3);
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.lineWidth = 3;
+        this.ctx.strokeText(symbol, x, iconY);
+        this.ctx.fillText(symbol, x, iconY);
         this.ctx.globalAlpha = 1;
     }
 
@@ -359,7 +370,7 @@ class HexGame {
             // Draw door with enhanced visibility
             // Door background circle
             this.ctx.beginPath();
-            this.ctx.arc(x, y, this.hexSize * 0.35, 0, Math.PI * 2);
+            this.ctx.arc(x, y, this.hexSize * 0.4, 0, Math.PI * 2);
             this.ctx.fillStyle = 'rgba(139, 69, 19, 0.8)'; // Brown background
             this.ctx.fill();
             this.ctx.strokeStyle = '#8B4513';
@@ -367,7 +378,7 @@ class HexGame {
             this.ctx.stroke();
             
             // Door icon
-            const size = this.hexSize * 0.5;
+            const size = this.hexSize * 0.62;
             this.ctx.font = `${size}px Arial`;
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
@@ -387,7 +398,7 @@ class HexGame {
             // Draw wall with stone-like appearance
             // Wall background
             this.ctx.beginPath();
-            this.ctx.arc(x, y, this.hexSize * 0.3, 0, Math.PI * 2);
+            this.ctx.arc(x, y, this.hexSize * 0.36, 0, Math.PI * 2);
             this.ctx.fillStyle = 'rgba(105, 105, 105, 0.9)'; // Dark gray background
             this.ctx.fill();
             this.ctx.strokeStyle = '#2F4F4F';
@@ -395,7 +406,7 @@ class HexGame {
             this.ctx.stroke();
             
             // Wall icon
-            const size = this.hexSize * 0.4;
+            const size = this.hexSize * 0.54;
             this.ctx.font = `${size}px Arial`;
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
