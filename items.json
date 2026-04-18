@@ -1,0 +1,893 @@
+{
+  "items": [
+    {
+      "nombre": "Espada oxidada",
+      "descripcion": "Una espada vieja pero confiable.",
+      "tipo": "Arma",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 9, "dex": 0, "char": 0 }
+    },
+    {
+      "nombre": "Capucha de ladrón",
+      "descripcion": "Oculta tu rostro y vuelve tus movimientos más discretos.",
+      "tipo": "Casco",
+      "nivel": 1,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 5, "char": 1 }
+    },
+    {
+      "nombre": "Escudo de ladrón",
+      "descripcion": "Protección ligera que no estorba al huir.",
+      "tipo": "Pechera",
+      "nivel": 1,
+      "estadisticas": { "hp": 8, "str": 2, "dex": 1, "char": 0 }
+    },
+    {
+      "nombre": "Sotana del orador",
+      "descripcion": "Vestimenta que impone respeto al hablar.",
+      "tipo": "Pechera",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 0, "char": 10 }
+    },
+    {
+      "nombre": "Botas de cuero",
+      "descripcion": "Calzado cómodo para viajes largos y pasos firmes.",
+      "tipo": "Calzado",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 8, "char": 0 }
+    },
+    {
+      "nombre": "Amuleto húmedo",
+      "descripcion": "Una joya hallada en aguas quietas que inspira calma.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 0, "char": 6 }
+    },
+    {
+      "nombre": "Daga reforjada",
+      "descripcion": "Pequeña, filosa y sorprendentemente balanceada.",
+      "tipo": "Arma",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 4, "dex": 5, "char": 0 }
+    },
+    {
+      "nombre": "Pluma negra",
+      "descripcion": "Un adorno oscuro que vuelve tu imagen más enigmática.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 1, "char": 7 }
+    },
+    {
+      "nombre": "Capa de apostador",
+      "descripcion": "Prenda vistosa que hace más fácil aparentar seguridad.",
+      "tipo": "Pechera",
+      "nivel": 1,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 1, "char": 8 }
+    },
+    {
+      "nombre": "Fragmento sagrado",
+      "descripcion": "Resto de una estatua santa, cargado de presencia.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 5, "str": 0, "dex": 0, "char": 5 }
+    },
+    {
+      "nombre": "Mapa robado",
+      "descripcion": "Un mapa incompleto, pero muy útil para moverse mejor.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 6, "char": 2 }
+    },
+    {
+      "nombre": "Arco de cazador",
+      "descripcion": "Arco flexible, preciso y silencioso.",
+      "tipo": "Arma",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 2, "dex": 8, "char": 0 }
+    },
+    {
+      "nombre": "Maza tosca",
+      "descripcion": "Golpea fuerte aunque no sea elegante.",
+      "tipo": "Arma",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 10, "dex": 0, "char": 0 }
+    },
+    {
+      "nombre": "Capucha gris",
+      "descripcion": "Ideal para perderse en la niebla o entre la multitud.",
+      "tipo": "Casco",
+      "nivel": 1,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 6, "char": 2 }
+    },
+    {
+      "nombre": "Escama tóxica",
+      "descripcion": "Conserva algo del veneno y de la dureza del pantano.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 3, "str": 2, "dex": 2, "char": 0 }
+    },
+    {
+      "nombre": "Reliquia antigua",
+      "descripcion": "Objeto viejo y valioso que llama la atención correcta.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 1, "str": 1, "dex": 1, "char": 7 }
+    },
+    {
+      "nombre": "Insignia fronteriza",
+      "descripcion": "Una marca oficial que suaviza algunos encuentros.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 0, "char": 8 }
+    },
+    {
+      "nombre": "Garra ennegrecida",
+      "descripcion": "Trofeo salvaje que intimida más de lo esperado.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 4, "dex": 1, "char": 3 }
+    },
+    {
+      "nombre": "Hoja templada",
+      "descripcion": "Arma bien hecha, simple y efectiva.",
+      "tipo": "Arma",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 8, "dex": 2, "char": 0 }
+    },
+    {
+      "nombre": "Pluma del augurio",
+      "descripcion": "Una pluma rara que da un aire profético.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 0, "char": 8 }
+    },
+    {
+      "nombre": "Manto de jugador",
+      "descripcion": "Hecho para salones ruidosos y promesas peligrosas.",
+      "tipo": "Pechera",
+      "nivel": 1,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 0, "char": 9 }
+    },
+    {
+      "nombre": "Espejo pulido",
+      "descripcion": "Tu reflejo parece más convincente que vos mismo.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 0, "char": 9 }
+    },
+    {
+      "nombre": "Botas reforzadas",
+      "descripcion": "Calzado firme para correr, frenar y cambiar de ritmo.",
+      "tipo": "Calzado",
+      "nivel": 1,
+      "estadisticas": { "hp": 2, "str": 1, "dex": 7, "char": 0 }
+    },
+    {
+      "nombre": "Botas del orador",
+      "descripcion": "Cada paso acompaña tu presencia escénica.",
+      "tipo": "Calzado",
+      "nivel": 1,
+      "estadisticas": { "hp": 1, "str": 0, "dex": 3, "char": 6 }
+    },
+    {
+      "nombre": "Campana del monje",
+      "descripcion": "Su sonido calma discusiones y ordena el ánimo.",
+      "tipo": "Arma",
+      "nivel": 1,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 0, "char": 8 }
+    },
+    {
+      "nombre": "Casco del farsante",
+      "descripcion": "Te ayuda a aparentar más confianza de la que tenés.",
+      "tipo": "Casco",
+      "nivel": 1,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 2, "char": 5 }
+    },
+    {
+      "nombre": "Pechera del vagabundo",
+      "descripcion": "Gastada, resistente y llena de remiendos útiles.",
+      "tipo": "Pechera",
+      "nivel": 1,
+      "estadisticas": { "hp": 8, "str": 2, "dex": 0, "char": 2 }
+    },
+    {
+      "nombre": "Amuleto de sonrisa falsa",
+      "descripcion": "Hace que incluso una mentira suene amable.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 0, "char": 9 }
+    },
+    {
+      "nombre": "Sandalias del peregrino",
+      "descripcion": "Ligeras y cómodas para quien nunca deja de avanzar.",
+      "tipo": "Calzado",
+      "nivel": 1,
+      "estadisticas": { "hp": 3, "str": 0, "dex": 6, "char": 2 }
+    },
+    {
+      "nombre": "Cuchillo ceremonial",
+      "descripcion": "Pequeño, brillante y sorprendentemente persuasivo.",
+      "tipo": "Arma",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 2, "dex": 2, "char": 6 }
+    },
+    {
+      "nombre": "Capucha del susurrador",
+      "descripcion": "Hace que tu voz parezca más profunda y segura.",
+      "tipo": "Casco",
+      "nivel": 1,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 3, "char": 5 }
+    },
+    {
+      "nombre": "Botas del mensajero",
+      "descripcion": "Diseñadas para correr sin perder compostura.",
+      "tipo": "Calzado",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 9, "char": 1 }
+    },
+    {
+      "nombre": "Amuleto del azar",
+      "descripcion": "Parece insignificante, pero algo siempre inclina la balanza.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 5, "str": 1, "dex": 1, "char": 3 }
+    },
+    {
+      "nombre": "Báculo de feria",
+      "descripcion": "Un arma decorativa que impresiona más de lo que hiere.",
+      "tipo": "Arma",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 3, "dex": 0, "char": 7 }
+    },
+    {
+      "nombre": "Casquete del recitador",
+      "descripcion": "Usado por artistas callejeros de gran voz.",
+      "tipo": "Casco",
+      "nivel": 1,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 1, "char": 7 }
+    },
+    {
+      "nombre": "Chaqueta de cartas",
+      "descripcion": "Pechera flexible con bolsillos para todo tipo de truco.",
+      "tipo": "Pechera",
+      "nivel": 1,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 3, "char": 4 }
+    },
+    {
+      "nombre": "Suecos del predicador",
+      "descripcion": "No son rápidos, pero hacen que te escuchen.",
+      "tipo": "Calzado",
+      "nivel": 1,
+      "estadisticas": { "hp": 1, "str": 0, "dex": 1, "char": 8 }
+    },
+    {
+      "nombre": "Amuleto de mercado",
+      "descripcion": "Talismán de trueque muy valorado entre comerciantes chicos.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 2, "char": 7 }
+    },
+    {
+      "nombre": "Lanza corta de patrulla",
+      "descripcion": "Simple, firme y mejor de lo que aparenta.",
+      "tipo": "Arma",
+      "nivel": 1,
+      "estadisticas": { "hp": 0, "str": 7, "dex": 3, "char": 0 }
+    },
+    {
+      "nombre": "Cofia bendita",
+      "descripcion": "Una protección humilde que inspira confianza.",
+      "tipo": "Casco",
+      "nivel": 1,
+      "estadisticas": { "hp": 5, "str": 0, "dex": 0, "char": 5 }
+    },
+    {
+      "nombre": "Corpiño de viaje",
+      "descripcion": "Ligero y resistente, ideal para aventuras cortas y discusiones largas.",
+      "tipo": "Pechera",
+      "nivel": 1,
+      "estadisticas": { "hp": 6, "str": 1, "dex": 1, "char": 3 }
+    },
+    {
+      "nombre": "Botines del ladrillo",
+      "descripcion": "Pesados, pero útiles para patear puertas y presumir dureza.",
+      "tipo": "Calzado",
+      "nivel": 1,
+      "estadisticas": { "hp": 2, "str": 3, "dex": 3, "char": 1 }
+    },
+    {
+      "nombre": "Amuleto de campamento",
+      "descripcion": "Recuerdo amistoso que te hace caer mejor.",
+      "tipo": "Amuleto",
+      "nivel": 1,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 0, "char": 6 }
+    },
+    {
+      "nombre": "Sotana consagrada",
+      "descripcion": "Vestidura de mayor rango espiritual.",
+      "tipo": "Pechera",
+      "nivel": 2,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 0, "char": 14 }
+    },
+    {
+      "nombre": "Capa del infiltrado",
+      "descripcion": "Diseñada para quien entra y sale sin dejar rastro.",
+      "tipo": "Pechera",
+      "nivel": 2,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 12, "char": 2 }
+    },
+    {
+      "nombre": "Colmillo de lobo negro",
+      "descripcion": "Trofeo feroz de una bestia respetada por todos.",
+      "tipo": "Amuleto",
+      "nivel": 2,
+      "estadisticas": { "hp": 4, "str": 8, "dex": 0, "char": 4 }
+    },
+    {
+      "nombre": "Ballesta ligera",
+      "descripcion": "Arma precisa que premia la frialdad.",
+      "tipo": "Arma",
+      "nivel": 2,
+      "estadisticas": { "hp": 0, "str": 2, "dex": 16, "char": 0 }
+    },
+    {
+      "nombre": "Aliado mercenario",
+      "descripcion": "Más que un objeto, un contrato que se hace sentir.",
+      "tipo": "Amuleto",
+      "nivel": 2,
+      "estadisticas": { "hp": 10, "str": 8, "dex": 0, "char": 2 }
+    },
+    {
+      "nombre": "Reliquia del trueno",
+      "descripcion": "Conserva una chispa antigua y soberbia.",
+      "tipo": "Amuleto",
+      "nivel": 2,
+      "estadisticas": { "hp": 4, "str": 4, "dex": 6, "char": 4 }
+    },
+    {
+      "nombre": "Manto del espectro",
+      "descripcion": "Oscuro, elegante y muy difícil de seguir con la vista.",
+      "tipo": "Pechera",
+      "nivel": 2,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 14, "char": 4 }
+    },
+    {
+      "nombre": "Botas del rastreador veterano",
+      "descripcion": "Un paso experto deja menos huellas y más ventaja.",
+      "tipo": "Calzado",
+      "nivel": 2,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 15, "char": 1 }
+    },
+    {
+      "nombre": "Martillo de guerra ennegrecido",
+      "descripcion": "Cada golpe suena a sentencia.",
+      "tipo": "Arma",
+      "nivel": 2,
+      "estadisticas": { "hp": 0, "str": 18, "dex": 0, "char": 2 }
+    },
+    {
+      "nombre": "Yelmo del duelista",
+      "descripcion": "Protección para quien prefiere ganar con estilo.",
+      "tipo": "Casco",
+      "nivel": 2,
+      "estadisticas": { "hp": 10, "str": 0, "dex": 4, "char": 6 }
+    },
+    {
+      "nombre": "Coraza del campeón local",
+      "descripcion": "Pesada, brillante y muy buena para intimidar.",
+      "tipo": "Pechera",
+      "nivel": 2,
+      "estadisticas": { "hp": 18, "str": 6, "dex": 0, "char": 2 }
+    },
+    {
+      "nombre": "Amuleto de las runas viejas",
+      "descripcion": "Un pedazo de saber antiguo que fortalece tu imagen.",
+      "tipo": "Amuleto",
+      "nivel": 2,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 0, "char": 16 }
+    },
+    {
+      "nombre": "Hacha de bandolero veterano",
+      "descripcion": "Robusta, práctica y brutalmente efectiva.",
+      "tipo": "Arma",
+      "nivel": 2,
+      "estadisticas": { "hp": 0, "str": 17, "dex": 1, "char": 0 }
+    },
+    {
+      "nombre": "Máscara de niebla",
+      "descripcion": "Tu rostro desaparece, tu reputación crece.",
+      "tipo": "Casco",
+      "nivel": 2,
+      "estadisticas": { "hp": 6, "str": 0, "dex": 7, "char": 7 }
+    },
+    {
+      "nombre": "Sandalias del asceta",
+      "descripcion": "Marchas largas, palabras precisas, ego mínimo.",
+      "tipo": "Calzado",
+      "nivel": 2,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 8, "char": 10 }
+    },
+    {
+      "nombre": "Talismán del bosque antiguo",
+      "descripcion": "Transmite una quietud que obliga a escuchar.",
+      "tipo": "Amuleto",
+      "nivel": 2,
+      "estadisticas": { "hp": 10, "str": 0, "dex": 0, "char": 10 }
+    },
+    {
+      "nombre": "Espadón antiguo",
+      "descripcion": "Hoja de otra época, demasiado grande para dudar.",
+      "tipo": "Arma",
+      "nivel": 2,
+      "estadisticas": { "hp": 0, "str": 20, "dex": 0, "char": 0 }
+    },
+    {
+      "nombre": "Guantes de hierro negro",
+      "descripcion": "Parte de una vieja armadura de asedio.",
+      "tipo": "Pechera",
+      "nivel": 2,
+      "estadisticas": { "hp": 12, "str": 8, "dex": 0, "char": 0 }
+    },
+    {
+      "nombre": "Diadema de plegarias",
+      "descripcion": "Tocado sutil que hace que tu voz llegue más lejos.",
+      "tipo": "Casco",
+      "nivel": 2,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 0, "char": 14 }
+    },
+    {
+      "nombre": "Botas del diplomático",
+      "descripcion": "Te dejan entrar bien parado y salir bien hablado.",
+      "tipo": "Calzado",
+      "nivel": 2,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 8, "char": 10 }
+    },
+    {
+      "nombre": "Campana ritual mayor",
+      "descripcion": "No hiere mucho, pero cambia por completo una sala.",
+      "tipo": "Arma",
+      "nivel": 2,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 0, "char": 16 }
+    },
+    {
+      "nombre": "Casco del noble caído",
+      "descripcion": "Aún conserva parte del peso de un antiguo apellido.",
+      "tipo": "Casco",
+      "nivel": 2,
+      "estadisticas": { "hp": 12, "str": 2, "dex": 0, "char": 8 }
+    },
+    {
+      "nombre": "Pechera del comandante",
+      "descripcion": "Pensada para resistir y mandar al mismo tiempo.",
+      "tipo": "Pechera",
+      "nivel": 2,
+      "estadisticas": { "hp": 16, "str": 6, "dex": 0, "char": 6 }
+    },
+    {
+      "nombre": "Amuleto del predicador",
+      "descripcion": "Tus palabras parecen siempre llegar al blanco moral.",
+      "tipo": "Amuleto",
+      "nivel": 2,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 0, "char": 18 }
+    },
+    {
+      "nombre": "Espada del embajador",
+      "descripcion": "Elegante, afilada y perfectamente diplomática.",
+      "tipo": "Arma",
+      "nivel": 2,
+      "estadisticas": { "hp": 0, "str": 10, "dex": 4, "char": 6 }
+    },
+    {
+      "nombre": "Botas del infiltrado maestro",
+      "descripcion": "Hechas para desaparecer incluso bajo presión.",
+      "tipo": "Calzado",
+      "nivel": 2,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 18, "char": 2 }
+    },
+    {
+      "nombre": "Casco del actor",
+      "descripcion": "Una expresión convincente necesita apoyo técnico.",
+      "tipo": "Casco",
+      "nivel": 2,
+      "estadisticas": { "hp": 6, "str": 0, "dex": 2, "char": 12 }
+    },
+    {
+      "nombre": "Pechera del guardián espiritual",
+      "descripcion": "Absorbe impacto y mantiene la compostura.",
+      "tipo": "Pechera",
+      "nivel": 2,
+      "estadisticas": { "hp": 18, "str": 4, "dex": 0, "char": 6 }
+    },
+    {
+      "nombre": "Amuleto del juicio",
+      "descripcion": "Tus decisiones parecen más pesadas y definitivas.",
+      "tipo": "Amuleto",
+      "nivel": 2,
+      "estadisticas": { "hp": 8, "str": 0, "dex": 0, "char": 15 }
+    },
+    {
+      "nombre": "Lanza del magistrado",
+      "descripcion": "Arma simbólica, pero muy efectiva en las manos correctas.",
+      "tipo": "Arma",
+      "nivel": 2,
+      "estadisticas": { "hp": 0, "str": 11, "dex": 3, "char": 5 }
+    },
+    {
+      "nombre": "Casco de procesión",
+      "descripcion": "Más ceremonial que bélico, aunque sorprendentemente firme.",
+      "tipo": "Casco",
+      "nivel": 2,
+      "estadisticas": { "hp": 8, "str": 0, "dex": 0, "char": 12 }
+    },
+    {
+      "nombre": "Pechera del salón dorado",
+      "descripcion": "Brilla casi tanto como quien la usa.",
+      "tipo": "Pechera",
+      "nivel": 2,
+      "estadisticas": { "hp": 10, "str": 2, "dex": 0, "char": 10 }
+    },
+    {
+      "nombre": "Botas del corredor gris",
+      "descripcion": "Velocidad de persecución con presencia profesional.",
+      "tipo": "Calzado",
+      "nivel": 2,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 14, "char": 4 }
+    },
+    {
+      "nombre": "Amuleto del coro",
+      "descripcion": "Tu voz encuentra armonía incluso al discutir.",
+      "tipo": "Amuleto",
+      "nivel": 2,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 0, "char": 17 }
+    },
+    {
+      "nombre": "Túnica solar",
+      "descripcion": "Vestimenta sagrada de gran prestigio.",
+      "tipo": "Pechera",
+      "nivel": 3,
+      "estadisticas": { "hp": 8, "str": 0, "dex": 0, "char": 24 }
+    },
+    {
+      "nombre": "Garra de quimera",
+      "descripcion": "Arma hecha a partir de restos de algo imposible.",
+      "tipo": "Arma",
+      "nivel": 3,
+      "estadisticas": { "hp": 0, "str": 24, "dex": 6, "char": 0 }
+    },
+    {
+      "nombre": "Hacha brutal",
+      "descripcion": "No sirve para convencer, salvo por miedo.",
+      "tipo": "Arma",
+      "nivel": 3,
+      "estadisticas": { "hp": 0, "str": 32, "dex": 0, "char": 2 }
+    },
+    {
+      "nombre": "Capucha roja",
+      "descripcion": "Inquietante, veloz y memorable.",
+      "tipo": "Casco",
+      "nivel": 3,
+      "estadisticas": { "hp": 6, "str": 0, "dex": 14, "char": 10 }
+    },
+    {
+      "nombre": "Compañero dracónico",
+      "descripcion": "Llevar este vínculo encima cambia cómo te mira el mundo.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 18, "str": 8, "dex": 6, "char": 10 }
+    },
+    {
+      "nombre": "Pergamino del vacío",
+      "descripcion": "Entenderlo duele; aprovecharlo, también.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 6, "str": 0, "dex": 0, "char": 26 }
+    },
+    {
+      "nombre": "Arbalesta umbría",
+      "descripcion": "Una máquina de precisión silenciosa y cruel.",
+      "tipo": "Arma",
+      "nivel": 3,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 34, "char": 0 }
+    },
+    {
+      "nombre": "Botas míticas",
+      "descripcion": "Parecen recordar el camino antes que vos.",
+      "tipo": "Calzado",
+      "nivel": 3,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 24, "char": 4 }
+    },
+    {
+      "nombre": "Insignia imperial",
+      "descripcion": "Tu palabra gana peso antes de ser pronunciada.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 0, "char": 22 }
+    },
+    {
+      "nombre": "Espada carmesí",
+      "descripcion": "Una hoja famosa por victorias demasiado limpias.",
+      "tipo": "Arma",
+      "nivel": 3,
+      "estadisticas": { "hp": 0, "str": 26, "dex": 8, "char": 0 }
+    },
+    {
+      "nombre": "Hoja regia",
+      "descripcion": "Arma noble, elegante y peligrosamente confiada.",
+      "tipo": "Arma",
+      "nivel": 3,
+      "estadisticas": { "hp": 0, "str": 20, "dex": 6, "char": 8 }
+    },
+    {
+      "nombre": "Pluma final",
+      "descripcion": "Un símbolo oscuro que vuelve solemne cada gesto.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 0, "char": 20 }
+    },
+    {
+      "nombre": "Manto del apostador supremo",
+      "descripcion": "Te hace parecer dueño de la mesa aunque no lo seas.",
+      "tipo": "Pechera",
+      "nivel": 3,
+      "estadisticas": { "hp": 6, "str": 0, "dex": 0, "char": 22 }
+    },
+    {
+      "nombre": "Corazón titánico",
+      "descripcion": "Late con una fuerza que no debería existir.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 28, "str": 12, "dex": 0, "char": 0 }
+    },
+    {
+      "nombre": "Corona negra",
+      "descripcion": "No pide obediencia: la asume.",
+      "tipo": "Casco",
+      "nivel": 3,
+      "estadisticas": { "hp": 10, "str": 0, "dex": 0, "char": 24 }
+    },
+    {
+      "nombre": "Mapa de las profundidades",
+      "descripcion": "Conduce a lugares donde solo llegan los preparados.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 0, "str": 0, "dex": 18, "char": 8 }
+    },
+    {
+      "nombre": "Yelmo de placas reales",
+      "descripcion": "Protección digna de alguien que nunca retrocede primero.",
+      "tipo": "Casco",
+      "nivel": 3,
+      "estadisticas": { "hp": 20, "str": 4, "dex": 0, "char": 8 }
+    },
+    {
+      "nombre": "Pechera del conquistador",
+      "descripcion": "Armadura hecha para campañas largas y victorias públicas.",
+      "tipo": "Pechera",
+      "nivel": 3,
+      "estadisticas": { "hp": 30, "str": 10, "dex": 0, "char": 4 }
+    },
+    {
+      "nombre": "Grebas del coloso",
+      "descripcion": "Peso brutal, estabilidad perfecta.",
+      "tipo": "Calzado",
+      "nivel": 3,
+      "estadisticas": { "hp": 10, "str": 8, "dex": 14, "char": 0 }
+    },
+    {
+      "nombre": "Amuleto del eclipse",
+      "descripcion": "Toda presencia cerca tuyo se vuelve más tenue, menos importante.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 10, "str": 0, "dex": 0, "char": 24 }
+    },
+    {
+      "nombre": "Lanza solar",
+      "descripcion": "Brillante, extensa y ceremoniosamente letal.",
+      "tipo": "Arma",
+      "nivel": 3,
+      "estadisticas": { "hp": 0, "str": 22, "dex": 6, "char": 6 }
+    },
+    {
+      "nombre": "Capucha del heraldo astral",
+      "descripcion": "La llevás vos, pero parece observar desde más arriba.",
+      "tipo": "Casco",
+      "nivel": 3,
+      "estadisticas": { "hp": 6, "str": 0, "dex": 4, "char": 18 }
+    },
+    {
+      "nombre": "Pechera del guardián del portal",
+      "descripcion": "Hecha para soportar cosas que no pertenecen a este mundo.",
+      "tipo": "Pechera",
+      "nivel": 3,
+      "estadisticas": { "hp": 26, "str": 8, "dex": 0, "char": 6 }
+    },
+    {
+      "nombre": "Botas del vacío",
+      "descripcion": "Tus pasos llegan antes que tu sombra.",
+      "tipo": "Calzado",
+      "nivel": 3,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 28, "char": 4 }
+    },
+    {
+      "nombre": "Amuleto de la fractura",
+      "descripcion": "Un talismán inestable que inclina la realidad a tu favor.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 14, "str": 0, "dex": 0, "char": 18 }
+    },
+    {
+      "nombre": "Espadón del emperador maldito",
+      "descripcion": "Poder, peso y una historia muy mala para cualquiera que lo enfrente.",
+      "tipo": "Arma",
+      "nivel": 3,
+      "estadisticas": { "hp": 0, "str": 34, "dex": 0, "char": 4 }
+    },
+    {
+      "nombre": "Corona del oráculo eterno",
+      "descripcion": "Una voz así no suena fuerte; suena inevitable.",
+      "tipo": "Casco",
+      "nivel": 3,
+      "estadisticas": { "hp": 8, "str": 0, "dex": 0, "char": 28 }
+    },
+    {
+      "nombre": "Túnica del amanecer",
+      "descripcion": "Luminosa, solemne y extrañamente resistente.",
+      "tipo": "Pechera",
+      "nivel": 3,
+      "estadisticas": { "hp": 18, "str": 0, "dex": 0, "char": 20 }
+    },
+    {
+      "nombre": "Sandalias doradas",
+      "descripcion": "Cada paso parece una entrada triunfal.",
+      "tipo": "Calzado",
+      "nivel": 3,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 16, "char": 10 }
+    },
+    {
+      "nombre": "Talismán del rey caído",
+      "descripcion": "Lo que queda de un reinado también pesa.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 16, "str": 2, "dex": 0, "char": 18 }
+    },
+    {
+      "nombre": "Botas del rey errante",
+      "descripcion": "Parecen gastadas, pero cada paso manda.",
+      "tipo": "Calzado",
+      "nivel": 3,
+      "estadisticas": { "hp": 8, "str": 0, "dex": 14, "char": 16 }
+    },
+    {
+      "nombre": "Campana del eclipse",
+      "descripcion": "El sonido no golpea el oído: golpea la voluntad.",
+      "tipo": "Arma",
+      "nivel": 3,
+      "estadisticas": { "hp": 8, "str": 0, "dex": 0, "char": 30 }
+    },
+    {
+      "nombre": "Casco del soberano",
+      "descripcion": "No protege solo la cabeza; protege la idea de mando.",
+      "tipo": "Casco",
+      "nivel": 3,
+      "estadisticas": { "hp": 18, "str": 2, "dex": 0, "char": 20 }
+    },
+    {
+      "nombre": "Pechera del dios caído",
+      "descripcion": "Pesada, solemne y absurda en resistencia.",
+      "tipo": "Pechera",
+      "nivel": 3,
+      "estadisticas": { "hp": 34, "str": 12, "dex": 0, "char": 8 }
+    },
+    {
+      "nombre": "Amuleto de dominación",
+      "descripcion": "No mejora tu voz: reduce la del resto.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 8, "str": 0, "dex": 0, "char": 30 }
+    },
+    {
+      "nombre": "Espada del emperador",
+      "descripcion": "Una hoja que parece decidir antes que vos.",
+      "tipo": "Arma",
+      "nivel": 3,
+      "estadisticas": { "hp": 0, "str": 28, "dex": 6, "char": 6 }
+    },
+    {
+      "nombre": "Botas del vacío consciente",
+      "descripcion": "Las usás vos, pero dan la impresión de caminar solas.",
+      "tipo": "Calzado",
+      "nivel": 3,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 30, "char": 2 }
+    },
+    {
+      "nombre": "Casco del dios orador",
+      "descripcion": "Nadie sabe si te escuchan por respeto o por miedo.",
+      "tipo": "Casco",
+      "nivel": 3,
+      "estadisticas": { "hp": 10, "str": 0, "dex": 0, "char": 30 }
+    },
+    {
+      "nombre": "Pechera del conquistador eterno",
+      "descripcion": "Demasiado valiosa como para perder una sola batalla.",
+      "tipo": "Pechera",
+      "nivel": 3,
+      "estadisticas": { "hp": 28, "str": 14, "dex": 2, "char": 6 }
+    },
+    {
+      "nombre": "Amuleto del juicio final",
+      "descripcion": "Tus palabras dejan de ser opinión y empiezan a ser sentencia.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 12, "str": 0, "dex": 0, "char": 28 }
+    },
+    {
+      "nombre": "Martillo del alto coro",
+      "descripcion": "Golpea fuerte y suena aún más fuerte.",
+      "tipo": "Arma",
+      "nivel": 3,
+      "estadisticas": { "hp": 0, "str": 24, "dex": 0, "char": 12 }
+    },
+    {
+      "nombre": "Máscara del tribunal",
+      "descripcion": "Quien la lleva parece tener siempre razón.",
+      "tipo": "Casco",
+      "nivel": 3,
+      "estadisticas": { "hp": 8, "str": 0, "dex": 0, "char": 24 }
+    },
+    {
+      "nombre": "Armadura del salón supremo",
+      "descripcion": "Pensada para sobrevivir a golpes y a intrigas.",
+      "tipo": "Pechera",
+      "nivel": 3,
+      "estadisticas": { "hp": 24, "str": 6, "dex": 0, "char": 12 }
+    },
+    {
+      "nombre": "Botas del magistrado celeste",
+      "descripcion": "Veloces, elegantes y difíciles de ignorar.",
+      "tipo": "Calzado",
+      "nivel": 3,
+      "estadisticas": { "hp": 2, "str": 0, "dex": 18, "char": 12 }
+    },
+    {
+      "nombre": "Amuleto del coro inmóvil",
+      "descripcion": "Hace que una sala entera baje la voz cuando hablás.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 6, "str": 0, "dex": 0, "char": 26 }
+    },
+    {
+      "nombre": "Lanza del pacto",
+      "descripcion": "Arma solemne que obliga a tomarte en serio.",
+      "tipo": "Arma",
+      "nivel": 3,
+      "estadisticas": { "hp": 0, "str": 18, "dex": 4, "char": 10 }
+    },
+    {
+      "nombre": "Casco de la audiencia final",
+      "descripcion": "Cada mirada tuya pesa como una acusación.",
+      "tipo": "Casco",
+      "nivel": 3,
+      "estadisticas": { "hp": 12, "str": 0, "dex": 0, "char": 22 }
+    },
+    {
+      "nombre": "Pechera de obsidiana viva",
+      "descripcion": "Se adapta al golpe y devuelve parte del miedo.",
+      "tipo": "Pechera",
+      "nivel": 3,
+      "estadisticas": { "hp": 32, "str": 8, "dex": 0, "char": 4 }
+    },
+    {
+      "nombre": "Grebas del peregrino negro",
+      "descripcion": "Sirven para marchar, perseguir y entrar con presencia.",
+      "tipo": "Calzado",
+      "nivel": 3,
+      "estadisticas": { "hp": 6, "str": 2, "dex": 18, "char": 8 }
+    },
+    {
+      "nombre": "Amuleto de la última palabra",
+      "descripcion": "Casi nadie discute después de escucharte.",
+      "tipo": "Amuleto",
+      "nivel": 3,
+      "estadisticas": { "hp": 4, "str": 0, "dex": 0, "char": 32 }
+    }
+  ]
+}
