@@ -10,6 +10,10 @@ class StartScreen {
     }
 
     resolveApiBaseUrl() {
+        if (window.CONFIG && window.CONFIG.API_BASE_URL) {
+            return window.CONFIG.API_BASE_URL.replace(/\/$/, '');
+        }
+
         const configuredBaseUrl = document.body.dataset.apiBaseUrl;
         if (configuredBaseUrl) {
             return configuredBaseUrl.replace(/\/$/, '');
@@ -56,13 +60,13 @@ class StartScreen {
 
         const nombre = this.nameInput.value.trim();
         if (!nombre) {
-            this.setStatus('Write a goblin name before choosing an archetype.', true);
+            this.setStatus('Escribe un nombre antes de elegir tu goblin.', true);
             this.nameInput.focus();
             return;
         }
 
         this.setSubmittingState(true);
-        this.setStatus('Creating run...', false);
+        this.setStatus('Creando partida...', false);
 
         try {
             const response = await fetch(`${this.apiBaseUrl}/run/nueva`, {
@@ -78,17 +82,17 @@ class StartScreen {
 
             const payload = await response.json().catch(() => null);
             if (!response.ok) {
-                const detail = payload && payload.detail ? payload.detail : 'Could not create the run.';
+                const detail = payload && payload.detail ? payload.detail : 'No se pudo crear la partida.';
                 throw new Error(detail);
             }
 
             sessionStorage.setItem('goblin-run', JSON.stringify(payload));
-            this.setStatus(`Run created for ${payload.goblin.nombre}. Entering the dungeon...`, false);
+            this.setStatus(`Partida creada para ${payload.goblin.nombre}. Entrando a la mazmorra...`, false);
             window.location.href = 'index.html';
         } catch (error) {
             const message = error instanceof TypeError
-                ? `Could not connect to the backend at ${this.apiBaseUrl}.`
-                : (error.message || 'Could not create the run.');
+                ? `No se pudo conectar con el backend en ${this.apiBaseUrl}.`
+                : (error.message || 'No se pudo crear la partida.');
             this.setStatus(message, true);
         } finally {
             this.setSubmittingState(false);

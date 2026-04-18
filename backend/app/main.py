@@ -55,9 +55,14 @@ class LootPayload(BaseModel):
     cantidad: int = Field(default=1, ge=1)
 
     @root_validator
-    def validate_loot_source(cls, values) -> dict:
-        explicit_item = values.get("item_id") is not None or values.get("item_code") is not None
-        random_item = values.get("nivel") is not None or values.get("zona") is not None
+    def validate_loot_source(cls, values: dict[str, object]) -> dict[str, object]:
+        item_id = values.get("item_id")
+        item_code = values.get("item_code")
+        nivel = values.get("nivel")
+        zona = values.get("zona")
+
+        explicit_item = item_id is not None or item_code is not None
+        random_item = nivel is not None or zona is not None
 
         if explicit_item and random_item:
             raise ValueError("Envia un item especifico o un nivel/zona para loot aleatorio, no ambas cosas.")
@@ -65,10 +70,10 @@ class LootPayload(BaseModel):
         if not explicit_item and not random_item:
             raise ValueError("Debes enviar item_id, item_code, nivel o zona.")
 
-        if values.get("item_id") is not None and values.get("item_code") is not None:
+        if item_id is not None and item_code is not None:
             raise ValueError("Debes enviar solo uno: item_id o item_code.")
 
-        if values.get("nivel") is not None and values.get("zona") is not None:
+        if nivel is not None and zona is not None:
             raise ValueError("Debes enviar solo uno: nivel o zona.")
 
         return values

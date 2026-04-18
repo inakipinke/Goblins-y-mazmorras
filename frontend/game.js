@@ -7,10 +7,11 @@ class HexGame {
         this.ringWidths = [1, 8, 8, 6]; // Larger map: Center, inner, middle, outer ring widths
         this.maxRadius = this.ringWidths.reduce((sum, width) => sum + width, 0) - 1;
         this.hexSize = 30; // Fixed hex size for consistent zoom
-        this.playerStats = { fuerza: 0, carisma: 0, destreza: 0, hp: 0 };
         this.apiBaseUrl = (window.CONFIG && window.CONFIG.API_BASE_URL)
             ? window.CONFIG.API_BASE_URL
             : this.resolveApiBaseUrl();
+        this.playerStats = { fuerza: 0, carisma: 0, destreza: 0, hp: 0 };
+        this.playerProfile = { nombre: 'Goblin Aventurero', arquetipo: 'romantico' };
         this.inventoryItems = [];
         this.eventCatalog = [
             { type: 'Combate', icon: '⚔️', color: '#e74c3c', probability: 0.16, message: '⚔️ Enemies close in. Time for a fight.' },
@@ -43,6 +44,7 @@ class HexGame {
         
         // Show default stats immediately
         this.playerStats = { fuerza: 8, carisma: 12, destreza: 10, hp: 100 };
+        this.playerProfile = { nombre: 'Goblin Aventurero', arquetipo: 'romantico' };
         this.showInitialStats();
         
         this.initializeGame();
@@ -991,6 +993,10 @@ class HexGame {
                 destreza: goblinData.stats_totales?.destreza || 10,
                 hp: goblinData.vida_actual || 100
             };
+            this.playerProfile = {
+                nombre: goblinData.nombre || 'Goblin Aventurero',
+                arquetipo: goblinData.arquetipo || 'romantico'
+            };
             
             console.log('Updated player stats from backend:', this.playerStats);
             
@@ -1001,8 +1007,19 @@ class HexGame {
             console.error('Failed to update player stats:', error);
             // Use default stats if API fails
             this.playerStats = { fuerza: 8, carisma: 12, destreza: 10, hp: 100 };
+            this.playerProfile = { nombre: 'Goblin Aventurero', arquetipo: 'romantico' };
             this.displayPlayerStats();
         }
+    }
+
+    getGoblinPortraitSrc(arquetipo) {
+        const portraits = {
+            malo: '../src/GoblinMalo.webp',
+            romantico: '../src/GoblinRomantico.webp',
+            rayo_mcqueen: '../src/GoblinMcQueen.webp'
+        };
+
+        return portraits[arquetipo] || portraits.romantico;
     }
 
     displayPlayerStats() {
@@ -1012,11 +1029,18 @@ class HexGame {
         const statCarisma = document.getElementById('statCarisma');
         const statDestreza = document.getElementById('statDestreza');
         const statHP = document.getElementById('statHP');
+        const chosenGoblinName = document.getElementById('chosenGoblinName');
+        const chosenGoblinPortrait = document.getElementById('chosenGoblinPortrait');
         
         if (statFuerza) statFuerza.textContent = this.playerStats.fuerza;
         if (statCarisma) statCarisma.textContent = this.playerStats.carisma;
         if (statDestreza) statDestreza.textContent = this.playerStats.destreza;
         if (statHP) statHP.textContent = this.playerStats.hp;
+        if (chosenGoblinName) chosenGoblinName.textContent = this.playerProfile.nombre || 'Goblin Aventurero';
+        if (chosenGoblinPortrait) {
+            chosenGoblinPortrait.src = this.getGoblinPortraitSrc(this.playerProfile.arquetipo);
+            chosenGoblinPortrait.alt = this.playerProfile.nombre || 'Goblin elegido';
+        }
         
         console.log('Stats updated in UI');
     }
@@ -2019,6 +2043,24 @@ class HexGame {
                 this.closeEventChat();
             }
         });
+    }
+
+    // Override the old auto-run bootstrap so the chosen archetype from start.html is preserved.
+    async ensureActiveRun() {
+        try {
+            await this.apiCall('/run/actual');
+            console.log('Active run found');
+        } catch (error) {
+            console.warn('No active run found, redirecting to start screen:', error);
+            if (!window.location.pathname.endsWith('start.html')) {
+                window.location.href = 'start.html';
+            }
+        }
+    }
+
+    // Nueva Partida should always return to the character picker.
+    async startNewRun() {
+        window.location.href = 'start.html';
     }
 
     render() {
