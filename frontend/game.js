@@ -7,6 +7,7 @@ class HexGame {
         this.ringWidths = [1, 8, 8, 6]; // Larger map: Center, inner, middle, outer ring widths
         this.maxRadius = this.ringWidths.reduce((sum, width) => sum + width, 0) - 1;
         this.hexSize = 30; // Fixed hex size for consistent zoom
+        this.apiBaseUrl = CONFIG.API_BASE_URL;
         this.eventCatalog = [
             { type: 'Combate', icon: '⚔️', color: '#e74c3c', probability: 0.16, message: '⚔️ Enemies close in. Time for a fight.' },
             { type: 'Jefe', icon: '👑', color: '#c0392b', probability: 0.05, message: '👑 A mighty boss blocks your path.' },
@@ -21,6 +22,8 @@ class HexGame {
         ];
         this.hexMap = this.generateCircularMap();
         this.tileStates = new Map();
+        this.currentEvent = null;
+        this.currentEventData = null;
         
         // Camera/viewport system
         this.camera = {
@@ -39,7 +42,7 @@ class HexGame {
         this.gameLoop();
     }
 
-    initializeGame() {
+    async initializeGame() {
         // Choose random starting position on the outer border
         const outerBorderHexes = this.hexMap.filter(hex => {
             const distance = Math.max(Math.abs(hex.q), Math.abs(hex.r), Math.abs(-hex.q - hex.r));
@@ -75,7 +78,36 @@ class HexGame {
         // Set adjacent tiles as discovered
         this.revealAdjacentTiles(this.goblin.q, this.goblin.r);
         
+        // Initialize backend run if needed
+        await this.ensureActiveRun();
+        
         console.log(`🎮 Game Started! Goblin spawned at border position (${this.goblin.q}, ${this.goblin.r}).`);
+    }
+
+    async ensureActiveRun() {
+        try {
+            // Check if there's an active run
+            await this.apiCall('/run/actual');
+            console.log('✅ Active run found');
+        } catch (error) {
+            // No active run, create one
+            console.log('🔄 Creating new run...');
+            try {
+                const arquetipos = ['romantico', 'malo', 'rayo_mcqueen'];
+                const randomArchetype = arquetipos[Math.floor(Math.random() * arquetipos.length)];
+                
+                await this.apiCall('/run/nueva', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        nombre: 'Goblin Aventurero',
+                        arquetipo: randomArchetype
+                    })
+                });
+                console.log(`✅ New run created with archetype: ${randomArchetype}`);
+            } catch (createError) {
+                console.warn('Failed to create new run:', createError);
+            }
+        }
     }
 
     setupWallsAndDoors() {
@@ -589,8 +621,115 @@ class HexGame {
         }
     }
 
+    // API Helper methods
+    async apiCall(endpoint, options = {}) {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}${endpoint}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                ...options
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+                throw new Error(errorData.detail || `HTTP ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error(`API call failed for ${endpoint}:`, error);
+            throw error;
+        }
+    }
+
+    async getGoblinStats() {
+        try {
+            return await this.apiCall('/goblin');
+        } catch (error) {
+            console.warn('No active run found, using default stats');
+            return {
+                stats_totales: { fuerza: 8, carisma: 12, destreza: 10 },
+                stats_base: { fuerza: 8, carisma: 12, destreza: 10 }
+            };
+        }
+    }
+
+    async consumeEvent(zona, tipo) {
+        try {
+            return await this.apiCall('/eventos/consumir', {
+                method: 'POST',
+                body: JSON.stringify({ zona, tipo })
+            });
+        } catch (error) {
+            console.warn('Failed to consume event from backend:', error);
+            return null;
+        }
+    }
+
+    async applyEventConsequences(result, eventData) {
+        try {
+            if (result.passed) {
+                // Apply success consequences
+                if (eventData.success) {
+                    await this.applyEventEffects(eventData.success);
+                }
+            } else {
+                // Apply failure consequences
+                if (eventData.failure) {
+                    await this.applyEventEffects(eventData.failure);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to apply event consequences:', error);
+        }
+    }
+
+    async applyEventEffects(effects) {
+        try {
+            // Apply damage
+            if (effects.hp && effects.hp < 0) {
+                await this.apiCall('/goblin/recibir-dano', {
+                    method: 'POST',
+                    body: JSON.stringify({ cantidad: Math.abs(effects.hp) })
+                });
+            }
+            
+            // Apply healing
+            if (effects.hp && effects.hp > 0) {
+                // Use healing item if available, or just log
+                console.log(`Healed for ${effects.hp} HP`);
+            }
+            
+            // Add loot
+            if (effects.equipment && effects.equipment > 0) {
+                // Add random equipment
+                const items = ['garrote_astillado', 'rosa_robada', 'botas_chispeantes', 'chaleco_remendado'];
+                const randomItem = items[Math.floor(Math.random() * items.length)];
+                await this.apiCall('/inventario/loot', {
+                    method: 'POST',
+                    body: JSON.stringify({ item_code: randomItem, cantidad: effects.equipment })
+                });
+            }
+            
+            // Add gold
+            if (effects.gold) {
+                console.log(`Gained ${effects.gold} gold`);
+            }
+            
+            // Add skill points
+            if (effects.skillPoints) {
+                console.log(`Gained ${effects.skillPoints} skill points`);
+            }
+            
+        } catch (error) {
+            console.error('Failed to apply specific effect:', error);
+        }
+    }
+
     // Open event chat modal
-    openEventChat(event) {
+    async openEventChat(event) {
         const modal = document.getElementById('eventChatModal');
         const messagesContainer = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
@@ -605,6 +744,10 @@ class HexGame {
         // Store current event
         this.currentEvent = event;
         
+        // Try to consume event from backend
+        const zona = this.getZoneForCurrentPosition();
+        this.currentEventData = await this.consumeEvent(zona, event.type);
+        
         // Show modal
         modal.classList.remove('hidden');
         
@@ -615,6 +758,17 @@ class HexGame {
         setTimeout(() => chatInput.focus(), 100);
     }
 
+    getZoneForCurrentPosition() {
+        const ring = this.getHexRing(this.goblin.q, this.goblin.r);
+        switch(ring) {
+            case 0:
+            case 1:
+            case 2: return 'inicial';
+            case 3: return 'ciudad';
+            default: return 'inicial';
+        }
+    }
+
     // Generate initial event description using AI
     async generateEventDescription(event) {
         const loadingDiv = document.getElementById('chatLoading');
@@ -623,23 +777,20 @@ class HexGame {
         try {
             loadingDiv.classList.remove('hidden');
             
-            // Get player stats (mock for now - should come from backend)
-            const playerStats = {
-                strength: 5,
-                charisma: 4,
-                agility: 7
-            };
+            // Get player stats from backend
+            const goblinData = await this.getGoblinStats();
             
             // Create event context for AI
             const eventContext = {
                 type: event.type,
-                description: this.getEventDescription(event.type)
+                description: this.getEventDescription(event.type),
+                backendData: this.currentEventData
             };
             
             // Call AI for initial description
             const description = await this.callAI('first-contact', {
                 EVENT: eventContext,
-                BASE_STATS: playerStats
+                BASE_STATS: goblinData.stats_base || goblinData.stats_totales
             });
             
             // Add GM message
@@ -716,27 +867,27 @@ class HexGame {
         this.addChatMessage('player', message);
         
         try {
-            // Get player stats (mock for now)
-            const playerStats = {
-                strength: 5,
-                charisma: 4,
-                agility: 7
-            };
+            // Get player stats from backend
+            const goblinData = await this.getGoblinStats();
             
-            // Create event requirements (mock for now)
-            const eventRequirements = {
-                strength: 6,
-                charisma: 5,
-                agility: 8
-            };
+            // Create event requirements based on backend event data
+            let eventRequirements = { fuerza: 6, carisma: 5, destreza: 8 };
+            if (this.currentEventData && this.currentEventData.evento && this.currentEventData.evento.options) {
+                eventRequirements = this.extractRequirementsFromOptions(this.currentEventData.evento.options);
+            }
             
             // Call AI for evaluation
             const result = await this.callAI('answer-evaluation', {
                 EVENT_CONTEXT: this.getEventDescription(this.currentEvent.type),
-                PLAYER_BASE_STATS: playerStats,
+                PLAYER_BASE_STATS: goblinData.stats_base || goblinData.stats_totales,
                 EVENT_REQUIREMENTS: eventRequirements,
                 PLAYER_MESSAGE: message
             });
+            
+            // Apply consequences to backend
+            if (this.currentEventData && this.currentEventData.evento) {
+                await this.applyEventConsequences(result, this.currentEventData.evento);
+            }
             
             // Process result
             this.processEventResult(result);
@@ -752,6 +903,28 @@ class HexGame {
             chatInput.value = '';
             chatInput.focus();
         }
+    }
+
+    extractRequirementsFromOptions(options) {
+        const requirements = { fuerza: 5, carisma: 5, destreza: 5 };
+        
+        if (Array.isArray(options)) {
+            options.forEach(option => {
+                if (option.stat && option.value) {
+                    const statMap = {
+                        'STR': 'fuerza',
+                        'CHAR': 'carisma', 
+                        'DEX': 'destreza'
+                    };
+                    const mappedStat = statMap[option.stat];
+                    if (mappedStat) {
+                        requirements[mappedStat] = Math.max(requirements[mappedStat], option.value);
+                    }
+                }
+            });
+        }
+        
+        return requirements;
     }
 
     // Process event result
@@ -778,34 +951,97 @@ class HexGame {
         await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
         
         if (promptType === 'first-contact') {
-            // Return mock description
+            // Use backend event data if available
+            if (data.EVENT.backendData && data.EVENT.backendData.evento) {
+                const evento = data.EVENT.backendData.evento;
+                if (evento.descripcion) {
+                    return evento.descripcion;
+                }
+            }
+            // Return fallback description
             return this.getFallbackDescription(data.EVENT.type);
         } else if (promptType === 'answer-evaluation') {
-            // Return mock evaluation
+            // Convert stats to match expected format
+            const playerStats = {
+                strength: data.PLAYER_BASE_STATS.fuerza || data.PLAYER_BASE_STATS.strength || 5,
+                charisma: data.PLAYER_BASE_STATS.carisma || data.PLAYER_BASE_STATS.charisma || 4,
+                agility: data.PLAYER_BASE_STATS.destreza || data.PLAYER_BASE_STATS.agility || 7
+            };
+            
+            const requirements = {
+                strength: data.EVENT_REQUIREMENTS.fuerza || data.EVENT_REQUIREMENTS.strength || 6,
+                charisma: data.EVENT_REQUIREMENTS.carisma || data.EVENT_REQUIREMENTS.charisma || 5,
+                agility: data.EVENT_REQUIREMENTS.destreza || data.EVENT_REQUIREMENTS.agility || 8
+            };
+            
+            // Simple evaluation logic
+            const bonus_strength = this.evaluateStatBonus(data.PLAYER_MESSAGE, 'strength');
+            const bonus_charisma = this.evaluateStatBonus(data.PLAYER_MESSAGE, 'charisma');
+            const bonus_agility = this.evaluateStatBonus(data.PLAYER_MESSAGE, 'agility');
+            
+            const effective_strength = playerStats.strength + bonus_strength;
+            const effective_charisma = playerStats.charisma + bonus_charisma;
+            const effective_agility = playerStats.agility + bonus_agility;
+            
+            const strength_path_passed = effective_strength >= requirements.strength;
+            const charisma_path_passed = effective_charisma >= requirements.charisma;
+            const agility_path_passed = effective_agility >= requirements.agility;
+            
+            const passed = strength_path_passed || charisma_path_passed || agility_path_passed;
+            
+            let best_path = 'strength';
+            if (charisma_path_passed && effective_charisma >= effective_strength && effective_charisma >= effective_agility) {
+                best_path = 'charisma';
+            } else if (agility_path_passed && effective_agility >= effective_strength && effective_agility >= effective_charisma) {
+                best_path = 'agility';
+            }
+            
             return {
-                quality: 4,
-                coherence: 5,
+                quality: Math.min(5, Math.max(1, Math.floor(data.PLAYER_MESSAGE.length / 10) + 2)),
+                coherence: 4,
                 roleplay_alignment: 4,
                 toxicity: 1,
-                bonus_strength: Math.random() > 0.5 ? 2 : 0,
-                bonus_charisma: Math.random() > 0.5 ? 1 : 0,
-                bonus_agility: Math.random() > 0.5 ? 1 : 0,
-                effective_strength: data.PLAYER_BASE_STATS.strength + 2,
-                effective_charisma: data.PLAYER_BASE_STATS.charisma + 1,
-                effective_agility: data.PLAYER_BASE_STATS.agility + 1,
-                strength_path_passed: Math.random() > 0.4,
-                charisma_path_passed: Math.random() > 0.6,
-                agility_path_passed: Math.random() > 0.5,
-                passed: Math.random() > 0.3,
-                best_path: ['strength', 'charisma', 'agility'][Math.floor(Math.random() * 3)],
+                bonus_strength,
+                bonus_charisma,
+                bonus_agility,
+                effective_strength,
+                effective_charisma,
+                effective_agility,
+                strength_path_passed,
+                charisma_path_passed,
+                agility_path_passed,
+                passed,
+                best_path,
                 missing_points: {
-                    strength: Math.floor(Math.random() * 3),
-                    charisma: Math.floor(Math.random() * 3),
-                    agility: Math.floor(Math.random() * 3)
+                    strength: Math.max(0, requirements.strength - effective_strength),
+                    charisma: Math.max(0, requirements.charisma - effective_charisma),
+                    agility: Math.max(0, requirements.agility - effective_agility)
                 },
-                notes: 'Acción evaluada correctamente.'
+                notes: passed ? 'Acción exitosa.' : 'La acción no fue suficiente para superar el desafío.'
             };
         }
+    }
+
+    evaluateStatBonus(message, statType) {
+        const lowerMessage = message.toLowerCase();
+        
+        const keywords = {
+            strength: ['ataco', 'golpeo', 'fuerza', 'rompo', 'destruyo', 'lucho', 'combato', 'agresivo', 'violento'],
+            charisma: ['hablo', 'convenzo', 'persuado', 'negocio', 'encanto', 'seduzco', 'intimido', 'miento', 'engaño'],
+            agility: ['esquivo', 'corro', 'salto', 'rápido', 'ágil', 'escabullo', 'huyo', 'evito', 'deslizo']
+        };
+        
+        const statKeywords = keywords[statType] || [];
+        let bonus = 0;
+        
+        statKeywords.forEach(keyword => {
+            if (lowerMessage.includes(keyword)) {
+                bonus += 1;
+            }
+        });
+        
+        // Cap bonus at 3
+        return Math.min(3, bonus);
     }
 
     // Close event chat
