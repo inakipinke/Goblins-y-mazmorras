@@ -1,0 +1,588 @@
+{
+  "level": 2,
+  "events": [
+    {
+      "name": "Emboscada de lobos negros",
+      "type": "Combate",
+      "description": "Una manada de lobos enormes te rodea en silencio.",
+      "options": [
+        { "stat": "STR", "value": 35, "action": "Abrirte paso" },
+        { "stat": "DEX", "value": 30, "action": "Trepar y escapar" },
+        { "stat": "CHAR", "value": 45, "action": "Calmar al alfa" }
+      ],
+      "success": { "skillPoints": 5, "items": ["Colmillo de lobo negro (+3STR)"] },
+      "failure": { "hp": -25 }
+    },
+    {
+      "name": "Santuario vital mayor",
+      "type": "Santuario",
+      "effect": { "hp": 35 }
+    },
+    {
+      "name": "Cofre del viajero perdido",
+      "type": "Objeto misterioso",
+      "effect": { "equipment": 1, "gold": 25 }
+    },
+    {
+      "name": "Refugio de bandoleros veteranos",
+      "type": "Combate",
+      "options": [
+        { "stat": "STR", "value": 40, "action": "Asaltar el refugio" },
+        { "stat": "DEX", "value": 30, "action": "Escabullirte" },
+        { "stat": "CHAR", "value": 45, "action": "Negociar salida" }
+      ],
+      "success": { "equipment": 2, "skillPoints": 2, "gold": 20 },
+      "failure": { "hp": -35 }
+    },
+    {
+      "name": "Altar de guerra",
+      "type": "Santuario",
+      "effect": { "skillPoints": 7, "str": 3 }
+    },
+    {
+      "name": "Pozo de ecos",
+      "type": "Objeto misterioso",
+      "effect": { "hp": -15, "char": 2, "skillPoints": 1 }
+    },
+    {
+      "name": "Academia del sigilo",
+      "type": "Entrenamiento",
+      "effect": {
+        "hp": -15,
+        "dex": 8,
+        "char": 3,
+        "items": ["Capa del infiltrado (+4DEX)"]
+      }
+    },
+    {
+      "name": "Forja de los proteicos",
+      "type": "Entrenamiento",
+      "effect": { "hp": 25, "str": 12, "dex": 6, "char": -8 }
+    },
+    {
+      "name": "Plaza de duelistas",
+      "type": "Jefe",
+      "options": [
+        { "stat": "STR", "value": 35, "action": "Retar al campeón" },
+        { "stat": "DEX", "value": 35, "action": "Vencer por agilidad" },
+        { "stat": "CHAR", "value": 45, "action": "Ganar a la multitud" }
+      ],
+      "success": { "skillPoints": 6, "gold": 25 },
+      "failure": { "hp": -45, "loseEquipment": 1 }
+    },
+    {
+      "name": "Mercader de reliquias",
+      "type": "Comerciante",
+      "effect": { "gold": -50, "equipment": 2 }
+    },
+    {
+      "name": "Templo de los payenes mayores",
+      "type": "Santuario",
+      "effect": {
+        "char": 8,
+        "gold": 20,
+        "items": ["Sotana consagrada (+12CHAR)"]
+      }
+    },
+    {
+      "name": "Clan de brutos acorazados",
+      "type": "Combate",
+      "options": [
+        { "stat": "STR", "value": 45, "action": "Derrotarlos" },
+        { "stat": "DEX", "value": 25, "action": "Huir" },
+        { "stat": "CHAR", "value": 30, "action": "Engañarlos" }
+      ],
+      "success": { "gold": 35, "items": ["Maza tosca (+4STR)"] },
+      "failure": { "hp": -40, "char": 2 }
+    },
+    {
+      "name": "Campos de niebla",
+      "type": "Trampa",
+      "description": "Formas hostiles emergen de la neblina.",
+      "options": [
+        { "stat": "STR", "value": 35, "action": "Romper la línea enemiga" },
+        { "stat": "DEX", "value": 25, "action": "Deslizarte entre la niebla" }
+      ],
+      "success": { "items": ["Capucha gris (+6DEX)"] },
+      "failure": { "hp": -30, "loseEquipment": 2 }
+    },
+    {
+      "name": "Casa de apuestas clandestina",
+      "type": "Social",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Convencer a la mesa" },
+        { "stat": "DEX", "value": 25, "action": "Hacer trampa" },
+        { "stat": "STR", "value": 35, "action": "Cobrar por la fuerza" }
+      ],
+      "success": { "gold": 40, "skillPoints": 2 },
+      "failure": { "gold": -25, "hp": -15 }
+    },
+    {
+      "name": "Bestia encadenada",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Liberarla con cuidado" },
+        { "stat": "STR", "value": 35, "action": "Domarla a la fuerza" },
+        { "stat": "DEX", "value": 30, "action": "Esquivar su furia" }
+      ],
+      "success": { "items": ["Compañero bestial"], "str": 2, "dex": 2 },
+      "failure": { "hp": -25 }
+    },
+    {
+      "name": "Puente colgante roto",
+      "type": "Trampa",
+      "options": [
+        { "stat": "DEX", "value": 35, "action": "Cruzar saltando" },
+        { "stat": "STR", "value": 25, "action": "Sostener y avanzar" }
+      ],
+      "success": { "equipment": 1, "gold": 20 },
+      "failure": { "hp": -25 }
+    },
+    {
+      "name": "Maestro errante",
+      "type": "Social",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Aprender de él" }
+      ],
+      "success": { "skillPoints": 5, "char": 2 }
+    },
+    {
+      "name": "Emboscada en el desfiladero",
+      "type": "Trampa",
+      "options": [
+        { "stat": "DEX", "value": 35, "action": "Cubrirte y contraatacar" },
+        { "stat": "STR", "value": 40, "action": "Cargar de frente" }
+      ],
+      "success": { "gold": 30, "equipment": 1 },
+      "failure": { "hp": -35 }
+    },
+    {
+      "name": "Archivo prohibido",
+      "type": "Exploración",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Descifrar los escritos" }
+      ],
+      "success": { "skillPoints": 6 },
+      "failure": { "hp": -15, "char": -1 }
+    },
+    {
+      "name": "Laguna tóxica",
+      "type": "Trampa",
+      "options": [
+        { "stat": "DEX", "value": 35, "action": "Cruzar por las piedras" },
+        { "stat": "STR", "value": 30, "action": "Abrirte paso nadando" }
+      ],
+      "success": { "gold": 20, "items": ["Escama tóxica"] },
+      "failure": { "hp": -30, "dex": -3 }
+    },
+    {
+      "name": "Ancestro del bosque",
+      "type": "Jefe",
+      "options": [
+        { "stat": "CHAR", "value": 40, "action": "Pedir su favor" },
+        { "stat": "STR", "value": 30, "action": "Enfrentarlo" }
+      ],
+      "success": { "hp": 20, "skillPoints": 3, "char": 2 },
+      "failure": { "hp": -30 }
+    },
+    {
+      "name": "Foso de gladiadores",
+      "type": "Jefe",
+      "options": [
+        { "stat": "STR", "value": 45, "action": "Ganar el combate" },
+        { "stat": "DEX", "value": 35, "action": "Sobrevivir por agilidad" }
+      ],
+      "success": { "gold": 45, "skillPoints": 4 },
+      "failure": { "hp": -40 }
+    },
+    {
+      "name": "Arcón maldito",
+      "type": "Objeto misterioso",
+      "options": [
+        { "stat": "DEX", "value": 30, "action": "Forzar cerradura" },
+        { "stat": "CHAR", "value": 35, "action": "Romper la maldición" }
+      ],
+      "success": { "equipment": 2, "gold": 15 },
+      "failure": { "hp": -25, "char": -3 }
+    },
+    {
+      "name": "Torre quebrada",
+      "type": "Exploración",
+      "options": [
+        { "stat": "DEX", "value": 35, "action": "Escalar hasta la cima" },
+        { "stat": "STR", "value": 30, "action": "Mover los escombros" }
+      ],
+      "success": { "items": ["Reliquia antigua"], "skillPoints": 2 },
+      "failure": { "hp": -20 }
+    },
+    {
+      "name": "Mensajero del rey",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "CHAR", "value": 25, "action": "Auxiliarlo" }
+      ],
+      "success": { "gold": 20, "skillPoints": 3 }
+    },
+    {
+      "name": "Compañía mercenaria",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "CHAR", "value": 40, "action": "Contratar su apoyo" },
+        { "stat": "STR", "value": 35, "action": "Vencer a su líder" }
+      ],
+      "success": { "items": ["Aliado mercenario (+4STR)"] },
+      "failure": { "hp": -35 }
+    },
+    {
+      "name": "Fuente lunar",
+      "type": "Objeto misterioso",
+      "effect": {
+        "random": [
+          { "hp": 30 },
+          { "char": 8 },
+          { "skillPoints": 4 }
+        ],
+        "failure": { "hp": -20 }
+      }
+    },
+    {
+      "name": "Trampa de hierro",
+      "type": "Trampa",
+      "options": [
+        { "stat": "DEX", "value": 40, "action": "Desactivarla" }
+      ],
+      "success": { "equipment": 1, "skillPoints": 1 },
+      "failure": { "hp": -30 }
+    },
+    {
+      "name": "Rito sangriento",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "CHAR", "value": 40, "action": "Resistir su influencia" },
+        { "stat": "STR", "value": 35, "action": "Interrumpir el rito" }
+      ],
+      "success": { "skillPoints": 5, "str": 2 },
+      "failure": { "hp": -25, "char": -3 }
+    },
+    {
+      "name": "Cazador de recompensas",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Disuadirlo" },
+        { "stat": "DEX", "value": 35, "action": "Perderlo entre sombras" }
+      ],
+      "success": { "items": ["Ballesta ligera (+6DEX)"] },
+      "failure": { "hp": -20 }
+    },
+    {
+      "name": "Mina profunda",
+      "type": "Exploración",
+      "options": [
+        { "stat": "DEX", "value": 35, "action": "Explorar las galerías" },
+        { "stat": "STR", "value": 30, "action": "Abrir un túnel cerrado" }
+      ],
+      "success": { "gold": 35, "equipment": 1 },
+      "failure": { "hp": -25 }
+    },
+    {
+      "name": "Noble sitiado",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "STR", "value": 30, "action": "Rescatarlo" },
+        { "stat": "CHAR", "value": 35, "action": "Cobrar una gran recompensa" }
+      ],
+      "success": { "gold": 50, "skillPoints": 3 },
+      "failure": { "hp": -20 }
+    },
+    {
+      "name": "Portal agrietado",
+      "type": "Objeto misterioso",
+      "effect": {
+        "success": { "skillPoints": 6, "hp": 15, "char": 2 },
+        "failure": { "hp": -35, "loseEquipment": 1 }
+      }
+    },
+    {
+      "name": "Caravana imperial destruida",
+      "type": "Exploración",
+      "description": "Restos de guardias y cajas de lujo cubren el suelo.",
+      "options": [
+        { "stat": "DEX", "value": 30, "action": "Saquear rápido" },
+        { "stat": "CHAR", "value": 25, "action": "Interrogar a un sobreviviente" },
+        { "stat": "STR", "value": 35, "action": "Romper un arcón sellado" }
+      ],
+      "success": { "gold": 30, "equipment": 1, "skillPoints": 1 },
+      "failure": { "hp": -20 }
+    },
+    {
+      "name": "Caverna de los murmullos",
+      "type": "Exploración",
+      "description": "Las piedras responden a tus pensamientos.",
+      "options": [
+        { "stat": "CHAR", "value": 35, "action": "Interpretar la voz de la cueva" },
+        { "stat": "DEX", "value": 30, "action": "Avanzar sin hacer ruido" },
+        { "stat": "STR", "value": 40, "action": "Romper las formaciones" }
+      ],
+      "success": { "skillPoints": 5 },
+      "failure": { "hp": -25, "char": -2 }
+    },
+    {
+      "name": "Mercader del desierto",
+      "type": "Comerciante",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Regatear" },
+        { "stat": "DEX", "value": 30, "action": "Robar mercancía" },
+        { "stat": "STR", "value": 35, "action": "Forzarlo a negociar" }
+      ],
+      "success": { "equipment": 1, "gold": 15 },
+      "failure": { "gold": -30, "hp": -10 }
+    },
+    {
+      "name": "Lago del espejo",
+      "type": "Objeto misterioso",
+      "description": "La superficie refleja una versión mejor de ti.",
+      "options": [
+        { "stat": "DEX", "value": 30, "action": "Tomar el objeto del fondo" },
+        { "stat": "CHAR", "value": 30, "action": "Aceptar la visión" }
+      ],
+      "success": {
+        "random": [
+          { "items": ["Espejo pulido (+5CHAR)"] },
+          { "hp": 20 },
+          { "gold": 25 }
+        ]
+      },
+      "failure": { "hp": -20 }
+    },
+    {
+      "name": "Puesto de cazadores veteranos",
+      "type": "Social",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Compartir botines" },
+        { "stat": "STR", "value": 30, "action": "Impresionarlos" },
+        { "stat": "DEX", "value": 35, "action": "Superar su prueba" }
+      ],
+      "success": { "items": ["Botas reforzadas (+4DEX)"], "skillPoints": 2 },
+      "failure": { "hp": -15 }
+    },
+    {
+      "name": "Ruinas del juramento",
+      "type": "Exploración",
+      "description": "Un antiguo templo conserva sellos aún vivos.",
+      "options": [
+        { "stat": "CHAR", "value": 40, "action": "Leer el juramento" },
+        { "stat": "DEX", "value": 30, "action": "Buscar el tesoro central" }
+      ],
+      "success": { "skillPoints": 6, "gold": 20 },
+      "failure": { "hp": -25, "char": -2 }
+    },
+    {
+      "name": "Pozo de plegarias",
+      "type": "Objeto misterioso",
+      "effect": {
+        "gold": -15,
+        "random": [
+          { "hp": 25 },
+          { "skillPoints": 4 },
+          { "char": 4 },
+          { "nothing": true }
+        ]
+      }
+    },
+    {
+      "name": "Guardia fronteriza",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "CHAR", "value": 35, "action": "Convencerlos de dejarte pasar" },
+        { "stat": "DEX", "value": 30, "action": "Cruzar por las sombras" },
+        { "stat": "STR", "value": 40, "action": "Abrirte paso" }
+      ],
+      "success": { "gold": 25, "items": ["Insignia fronteriza (+6CHAR)"] },
+      "failure": { "hp": -30, "gold": -15 }
+    },
+    {
+      "name": "Desafío del duelista carmesí",
+      "type": "Jefe",
+      "description": "Un espadachín famoso exige una muestra de valor.",
+      "options": [
+        { "stat": "STR", "value": 35, "action": "Aceptar el duelo" },
+        { "stat": "DEX", "value": 35, "action": "Vencerlo con técnica" },
+        { "stat": "CHAR", "value": 30, "action": "Provocarlo hasta quebrarlo" }
+      ],
+      "success": { "skillPoints": 3, "gold": 25 },
+      "failure": { "hp": -20, "char": -1 }
+    },
+    {
+      "name": "Asceta de la colina",
+      "type": "Social",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Escuchar su doctrina" }
+      ],
+      "success": { "skillPoints": 5, "hp": 15 },
+      "failure": { "nothing": true }
+    },
+    {
+      "name": "Nido de carroñeros gigantes",
+      "type": "Combate",
+      "description": "Los chillidos atraen más criaturas cada segundo.",
+      "options": [
+        { "stat": "DEX", "value": 35, "action": "Huir entre rocas" },
+        { "stat": "STR", "value": 30, "action": "Destruir el nido" }
+      ],
+      "success": { "items": ["Garra ennegrecida"], "gold": 20 },
+      "failure": { "hp": -30 }
+    },
+    {
+      "name": "Herrero de campaña",
+      "type": "Encuentro",
+      "description": "Te ofrece mejorar algo si lo ayudas con el trabajo pesado.",
+      "options": [
+        { "stat": "STR", "value": 30, "action": "Ayudarlo" },
+        { "stat": "CHAR", "value": 30, "action": "Inspirarlo" }
+      ],
+      "success": { "items": ["Hoja templada (+3STR)"], "equipment": 1 },
+      "failure": { "hp": -15 }
+    },
+    {
+      "name": "Cuervos del augurio",
+      "type": "Encuentro",
+      "description": "Las aves parecen custodiar una tumba reciente.",
+      "options": [
+        { "stat": "CHAR", "value": 35, "action": "Apaciguarlos" },
+        { "stat": "DEX", "value": 30, "action": "Pasar entre ellos" }
+      ],
+      "success": { "gold": 25, "items": ["Pluma del augurio (+3CHAR)"] },
+      "failure": { "hp": -15, "char": -1 }
+    },
+    {
+      "name": "Sala de apuestas",
+      "type": "Social",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Dominar la mesa" },
+        { "stat": "DEX", "value": 30, "action": "Manipular los dados" },
+        { "stat": "STR", "value": 35, "action": "Cobrar respeto" }
+      ],
+      "success": {
+        "random": [
+          { "gold": 45 },
+          { "items": ["Manto de jugador (+5CHAR)"] },
+          { "skillPoints": 3 }
+        ]
+      },
+      "failure": { "gold": -20, "hp": -15 }
+    },
+    {
+      "name": "Coloso inmóvil",
+      "type": "Jefe",
+      "description": "Una estatua ciclópea despierta con un crujido.",
+      "options": [
+        { "stat": "DEX", "value": 40, "action": "Evitar sus golpes" },
+        { "stat": "STR", "value": 45, "action": "Destrozarla" },
+        { "stat": "CHAR", "value": 45, "action": "Calmar al espíritu interno" }
+      ],
+      "success": { "items": ["Núcleo sagrado"], "skillPoints": 4 },
+      "failure": { "hp": -35 }
+    },
+    {
+      "name": "Joven carterista",
+      "type": "Encuentro",
+      "description": "Te roba y vacila al ver que lo descubres.",
+      "options": [
+        { "stat": "DEX", "value": 25, "action": "Atraparlo" },
+        { "stat": "CHAR", "value": 30, "action": "Perdonarlo y guiarlo" }
+      ],
+      "success": {
+        "random": [
+          { "gold": 15, "char": 3 },
+          { "items": ["Mapa escondido"] }
+        ]
+      },
+      "failure": { "gold": -20 }
+    },
+    {
+      "name": "Capilla olvidada",
+      "type": "Santuario",
+      "options": [
+        { "stat": "CHAR", "value": 35, "action": "Orar en silencio" },
+        { "stat": "DEX", "value": 30, "action": "Buscar un escondite secreto" }
+      ],
+      "success": { "hp": 25, "skillPoints": 3 },
+      "failure": { "hp": -20 }
+    },
+    {
+      "name": "Anillo de hongos azules",
+      "type": "Objeto misterioso",
+      "description": "Las esporas brillan cuando te acercas.",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Entrar con respeto" },
+        { "stat": "DEX", "value": 30, "action": "Recolectarlas" }
+      ],
+      "success": {
+        "random": [
+          { "hp": 20 },
+          { "dex": 4 },
+          { "char": 4 }
+        ]
+      },
+      "failure": { "hp": -20, "char": -1 }
+    },
+    {
+      "name": "Festival marcial",
+      "type": "Jefe",
+      "options": [
+        { "stat": "STR", "value": 45, "action": "Ganar el torneo de fuerza" },
+        { "stat": "DEX", "value": 45, "action": "Ganar el torneo de agilidad" },
+        { "stat": "CHAR", "value": 45, "action": "Conquistar al público" }
+      ],
+      "success": { "gold": 60, "skillPoints": 5, "equipment": 1 },
+      "failure": { "hp": -25, "char": -2 }
+    },
+    {
+      "name": "Restos del explorador",
+      "type": "Exploración",
+      "description": "Un aventurero muerto protege un secreto con su último agarre.",
+      "options": [
+        { "stat": "DEX", "value": 30, "action": "Registrarlo con rapidez" },
+        { "stat": "CHAR", "value": 30, "action": "Honrarlo primero" },
+        { "stat": "STR", "value": 30, "action": "Mover la losa cercana" }
+      ],
+      "success": { "items": ["Mapa sellado"], "gold": 20 },
+      "failure": { "hp": -15, "loseEquipment": 1 }
+    },
+    {
+      "name": "Jauría del pantano",
+      "type": "Combate",
+      "description": "Criaturas flacas y veloces te persiguen entre el barro.",
+      "options": [
+        { "stat": "STR", "value": 38, "action": "Hacerles frente" },
+        { "stat": "DEX", "value": 34, "action": "Escapar entre raíces" },
+        { "stat": "CHAR", "value": 42, "action": "Ahuyentarlas con presencia" }
+      ],
+      "success": { "gold": 20, "skillPoints": 2 },
+      "failure": { "hp": -28 }
+    },
+    {
+      "name": "Cripta del caballero caído",
+      "type": "Jefe",
+      "description": "Un sepulcro antiguo guarda armas y resentimiento.",
+      "options": [
+        { "stat": "STR", "value": 42, "action": "Vencer al guardián" },
+        { "stat": "DEX", "value": 34, "action": "Esquivar las trampas" },
+        { "stat": "CHAR", "value": 38, "action": "Honrar al difunto" }
+      ],
+      "success": { "items": ["Espadón antiguo (+5STR)"], "equipment": 1 },
+      "failure": { "hp": -35 }
+    },
+    {
+      "name": "Biblioteca hundida",
+      "type": "Exploración",
+      "description": "Los tomos rescatables se deshacen entre tus dedos.",
+      "options": [
+        { "stat": "CHAR", "value": 34, "action": "Salvar el conocimiento" },
+        { "stat": "DEX", "value": 32, "action": "Rescatar un manuscrito intacto" }
+      ],
+      "success": { "skillPoints": 6, "char": 2 },
+      "failure": { "hp": -18 }
+    }
+  ]
+}

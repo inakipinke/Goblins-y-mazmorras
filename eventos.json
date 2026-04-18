@@ -1,0 +1,576 @@
+{
+  "events": [
+    {
+      "name": "Trampa",
+      "type": "Combate",
+      "description": "Un animal salvaje te ataca.",
+      "options": [
+        { "stat": "STR", "value": 10, "action": "Ganar" },
+        { "stat": "DEX", "value": 30, "action": "Ganar" },
+        { "stat": "DEX", "value": 15, "action": "Huir" },
+        { "stat": "CHAR", "value": 50, "action": "Amaestrar" }
+      ],
+      "success": { "skillPoints": 4 },
+      "failure": { "hp": -15 }
+    },
+    {
+      "name": "Arbol rejuvenecedor",
+      "type": "Santuario",
+      "effect": { "hp": 20 }
+    },
+    {
+      "name": "Cofre misterioso",
+      "type": "Objeto misterioso",
+      "effect": { "equipment": 1, "gold": 10 }
+    },
+    {
+      "name": "Guarida de ladrones",
+      "type": "Combate",
+      "options": [
+        { "stat": "STR", "value": 25, "action": "Ganar" },
+        { "stat": "DEX", "value": 15, "action": "Huir" },
+        { "stat": "DEX", "value": 25, "action": "Ganar" },
+        { "stat": "CHAR", "value": 35, "action": "Huir" }
+      ],
+      "success": { "equipment": 2, "skillPoints": 1 },
+      "failure": { "hp": -25 }
+    },
+    {
+      "name": "Altar de los dioses",
+      "type": "Santuario",
+      "effect": { "skillPoints": 5 }
+    },
+    {
+      "name": "Pozo de los marcos",
+      "type": "Objeto misterioso",
+      "effect": { "hp": -10, "char": 1 }
+    },
+    {
+      "name": "Escuela de ladrones",
+      "type": "Entrenamiento",
+      "effect": {
+        "hp": -10,
+        "dex": 5,
+        "char": 2,
+        "items": ["Escudo de ladrón (+2DEX, reconocido como ladrón)"]
+      }
+    },
+    {
+      "name": "Gimnasio de los proteicos",
+      "type": "Entrenamiento",
+      "effect": { "hp": 20, "str": 10, "dex": 5, "char": -10 }
+    },
+    {
+      "name": "Plazoleta de los indeseables",
+      "type": "Combate",
+      "options": [
+        { "stat": "STR", "value": 20, "action": "Ganar" },
+        { "stat": "DEX", "value": 30, "action": "Ganar" },
+        { "stat": "CHAR", "value": 40, "action": "Ganar" }
+      ],
+      "success": { "skillPoints": 5 },
+      "failure": { "hp": -40, "loseAllEquipment": true }
+    },
+    {
+      "name": "Pequeño comerciante",
+      "type": "Comerciante",
+      "effect": { "gold": -30, "equipment": 1 }
+    },
+    {
+      "name": "Iglesia de los payenes",
+      "type": "Santuario",
+      "effect": {
+        "char": 5,
+        "gold": 10,
+        "items": ["Sotana del orador (+10CHAR)"]
+      }
+    },
+    {
+      "name": "Tribu de brutos",
+      "type": "Combate",
+      "options": [
+        { "stat": "STR", "value": 30, "action": "Ganar" },
+        { "stat": "DEX", "value": 15, "action": "Huir" },
+        { "stat": "CHAR", "value": 20, "action": "Huir" }
+      ],
+      "success": {
+        "gold": 20,
+        "items": ["Espada oxidada"]
+      },
+      "failure": { "hp": -30, "char": 2 }
+    },
+    {
+      "name": "Campo misterioso",
+      "type": "Trampa",
+      "description": "Enemigos sorpresa",
+      "options": [
+        { "stat": "STR", "value": 25, "action": "Ganar" },
+        { "stat": "DEX", "value": 15, "action": "Ganar" }
+      ],
+      "success": {
+        "items": ["Capucha de ladrón (+5DEX)"]
+      },
+      "failure": {
+        "hp": -20,
+        "loseEquipment": 2
+      }
+    },
+    {
+      "name": "Mercado negro",
+      "type": "Comerciante",
+      "options": [
+        { "stat": "CHAR", "value": 20, "action": "Negociar" },
+        { "stat": "DEX", "value": 15, "action": "Robar" },
+        { "stat": "STR", "value": 25, "action": "Intimidar" }
+      ],
+      "success": { "equipment": 2, "gold": -10 },
+      "failure": { "hp": -20, "loseEquipment": 1 }
+    },
+    {
+      "name": "Bestia herida",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "CHAR", "value": 15, "action": "Curar" },
+        { "stat": "STR", "value": 20, "action": "Rematar" },
+        { "stat": "DEX", "value": 20, "action": "Evitar" }
+      ],
+      "success": {
+        "items": ["Compañero animal"],
+        "dex": 2
+      },
+      "failure": { "hp": -15 }
+    },
+    {
+      "name": "Puente inestable",
+      "type": "Trampa",
+      "options": [
+        { "stat": "DEX", "value": 25, "action": "Cruzar" },
+        { "stat": "STR", "value": 15, "action": "Forzar paso" }
+      ],
+      "success": { "equipment": 1 },
+      "failure": { "hp": -20 }
+    },
+    {
+      "name": "Vagabundo sabio",
+      "type": "Social",
+      "options": [
+        { "stat": "CHAR", "value": 20, "action": "Escuchar" }
+      ],
+      "success": { "skillPoints": 3 }
+    },
+    {
+      "name": "Emboscada nocturna",
+      "type": "Trampa",
+      "options": [
+        { "stat": "DEX", "value": 30, "action": "Esquivar" },
+        { "stat": "STR", "value": 25, "action": "Luchar" }
+      ],
+      "success": { "gold": 15, "equipment": 1 },
+      "failure": { "hp": -25 }
+    },
+    {
+      "name": "Biblioteca abandonada",
+      "type": "Exploración",
+      "options": [
+        { "stat": "CHAR", "value": 20, "action": "Investigar" }
+      ],
+      "success": { "skillPoints": 5 },
+      "failure": { "hp": -10 }
+    },
+    {
+      "name": "Pantano venenoso",
+      "type": "Trampa",
+      "options": [
+        { "stat": "DEX", "value": 25, "action": "Cruzar" },
+        { "stat": "STR", "value": 20, "action": "Avanzar" }
+      ],
+      "success": { "gold": 10 },
+      "failure": { "hp": -20, "dex": -2 }
+    },
+    {
+      "name": "Espíritu del bosque",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Convencer" },
+        { "stat": "STR", "value": 20, "action": "Atacar" }
+      ],
+      "success": { "hp": 10, "skillPoints": 2 },
+      "failure": { "hp": -25 }
+    },
+    {
+      "name": "Arena de combate",
+      "type": "Combate",
+      "options": [
+        { "stat": "STR", "value": 30, "action": "Pelear" },
+        { "stat": "DEX", "value": 25, "action": "Esquivar" }
+      ],
+      "success": { "gold": 25, "skillPoints": 3 },
+      "failure": { "hp": -30 }
+    },
+    {
+      "name": "Cofre maldito",
+      "type": "Objeto misterioso",
+      "options": [
+        { "stat": "DEX", "value": 20, "action": "Abrir" },
+        { "stat": "CHAR", "value": 25, "action": "Resistir" }
+      ],
+      "success": { "equipment": 2 },
+      "failure": { "hp": -20, "char": -2 }
+    },
+    {
+      "name": "Torre derrumbada",
+      "type": "Exploración",
+      "options": [
+        { "stat": "DEX", "value": 25, "action": "Escalar" },
+        { "stat": "STR", "value": 20, "action": "Despejar" }
+      ],
+      "success": { "items": ["Equipamiento raro"] },
+      "failure": { "hp": -15 }
+    },
+    {
+      "name": "Mensajero perdido",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "CHAR", "value": 15, "action": "Ayudar" }
+      ],
+      "success": { "gold": 10, "skillPoints": 2 }
+    },
+    {
+      "name": "Clan de mercenarios",
+      "type": "Combate",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Negociar" },
+        { "stat": "STR", "value": 25, "action": "Enfrentar" }
+      ],
+      "success": { "items": ["Aliado (+3STR)"] },
+      "failure": { "hp": -30 }
+    },
+    {
+      "name": "Fuente mágica",
+      "type": "Objeto misterioso",
+      "effect": {
+        "random": [
+          { "hp": 20 },
+          { "char": 5 }
+        ],
+        "failure": { "hp": -15 }
+      }
+    },
+    {
+      "name": "Trampa explosiva",
+      "type": "Trampa",
+      "options": [
+        { "stat": "DEX", "value": 30, "action": "Desactivar" }
+      ],
+      "success": { "equipment": 1 },
+      "failure": { "hp": -25 }
+    },
+    {
+      "name": "Ritual oscuro",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Resistir" },
+        { "stat": "STR", "value": 25, "action": "Interrumpir" }
+      ],
+      "success": { "skillPoints": 4 },
+      "failure": { "hp": -20, "char": -2 }
+    },
+    {
+      "name": "Cazador solitario",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "CHAR", "value": 20, "action": "Persuadir" },
+        { "stat": "DEX", "value": 25, "action": "Huir" }
+      ],
+      "success": { "items": ["Arco (+5DEX)"] },
+      "failure": { "hp": -15 }
+    },
+    {
+      "name": "Mina abandonada",
+      "type": "Exploración",
+      "options": [
+        { "stat": "DEX", "value": 25, "action": "Explorar" },
+        { "stat": "STR", "value": 20, "action": "Excavar" }
+      ],
+      "success": { "gold": 20, "equipment": 1 },
+      "failure": { "hp": -20 }
+    },
+    {
+      "name": "Noble en peligro",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "STR", "value": 20, "action": "Salvar" },
+        { "stat": "CHAR", "value": 25, "action": "Negociar" }
+      ],
+      "success": { "gold": 30, "skillPoints": 3 },
+      "failure": { "hp": -15 }
+    },
+    {
+      "name": "Portal extraño",
+      "type": "Objeto misterioso",
+      "effect": {
+        "success": { "skillPoints": 5, "hp": 10 },
+        "failure": { "hp": -30, "loseEquipment": 1 }
+      }
+    },
+    {
+      "name": "Caravana rota",
+      "type": "Exploración",
+      "description": "Encuentras una carreta saqueada al borde del camino.",
+      "options": [
+        { "stat": "DEX", "value": 20, "action": "Rebuscar" },
+        { "stat": "CHAR", "value": 15, "action": "Preguntar a supervivientes" },
+        { "stat": "STR", "value": 25, "action": "Mover los restos" }
+      ],
+      "success": { "gold": 15, "equipment": 1 },
+      "failure": { "hp": -10 }
+    },
+    {
+      "name": "Cueva resonante",
+      "type": "Exploración",
+      "description": "Una cueva emite sonidos extraños que parecen voces.",
+      "options": [
+        { "stat": "CHAR", "value": 25, "action": "Interpretar los susurros" },
+        { "stat": "DEX", "value": 20, "action": "Avanzar con cautela" },
+        { "stat": "STR", "value": 30, "action": "Abrirse paso" }
+      ],
+      "success": { "skillPoints": 4 },
+      "failure": { "hp": -20, "char": -1 }
+    },
+    {
+      "name": "Mercader ambulante sospechoso",
+      "type": "Comerciante",
+      "options": [
+        { "stat": "CHAR", "value": 20, "action": "Regatear" },
+        { "stat": "DEX", "value": 20, "action": "Robarle" },
+        { "stat": "STR", "value": 25, "action": "Amenazar" }
+      ],
+      "success": { "equipment": 1, "gold": 5 },
+      "failure": { "gold": -20, "hp": -10 }
+    },
+    {
+      "name": "Lago cristalino",
+      "type": "Objeto misterioso",
+      "description": "El agua parece pura, pero algo se mueve debajo.",
+      "options": [
+        { "stat": "DEX", "value": 20, "action": "Pescar algo brillante" },
+        { "stat": "CHAR", "value": 20, "action": "Meditar junto al lago" }
+      ],
+      "success": {
+        "random": [
+          { "items": ["Amuleto húmedo (+3CHAR)"] },
+          { "hp": 15 },
+          { "gold": 20 }
+        ]
+      },
+      "failure": { "hp": -15 }
+    },
+    {
+      "name": "Campamento de cazadores",
+      "type": "Social",
+      "options": [
+        { "stat": "CHAR", "value": 20, "action": "Compartir historias" },
+        { "stat": "STR", "value": 20, "action": "Impresionarlos" },
+        { "stat": "DEX", "value": 25, "action": "Participar en la caza" }
+      ],
+      "success": { "items": ["Botas de cuero (+3DEX)"], "skillPoints": 1 },
+      "failure": { "hp": -10 }
+    },
+    {
+      "name": "Ruinas encantadas",
+      "type": "Exploración",
+      "description": "Viejas estructuras cubiertas de runas te rodean.",
+      "options": [
+        { "stat": "CHAR", "value": 30, "action": "Leer las runas" },
+        { "stat": "DEX", "value": 20, "action": "Buscar un tesoro" }
+      ],
+      "success": { "skillPoints": 5, "gold": 10 },
+      "failure": { "hp": -20, "char": -2 }
+    },
+    {
+      "name": "Pozo de los deseos",
+      "type": "Objeto misterioso",
+      "effect": {
+        "gold": -10,
+        "random": [
+          { "hp": 20 },
+          { "skillPoints": 3 },
+          { "char": 3 },
+          { "nothing": true }
+        ]
+      }
+    },
+    {
+      "name": "Patrulla real",
+      "type": "Encuentro",
+      "options": [
+        { "stat": "CHAR", "value": 25, "action": "Convencerlos de ayudarte" },
+        { "stat": "DEX", "value": 20, "action": "Escabullirte" },
+        { "stat": "STR", "value": 30, "action": "Enfrentarlos" }
+      ],
+      "success": { "gold": 20, "items": ["Sello real (+5CHAR)"] },
+      "failure": { "hp": -25, "gold": -10 }
+    },
+    {
+      "name": "Duelo callejero",
+      "type": "Combate",
+      "description": "Un fanfarrón te desafía frente a todos.",
+      "options": [
+        { "stat": "STR", "value": 25, "action": "Aceptar el duelo" },
+        { "stat": "DEX", "value": 25, "action": "Burlarlo y esquivar" },
+        { "stat": "CHAR", "value": 20, "action": "Humillarlo verbalmente" }
+      ],
+      "success": { "skillPoints": 2, "gold": 15 },
+      "failure": { "hp": -15, "char": -1 }
+    },
+    {
+      "name": "Monje errante",
+      "type": "Social",
+      "options": [
+        { "stat": "CHAR", "value": 20, "action": "Escuchar su enseñanza" }
+      ],
+      "success": { "skillPoints": 4, "hp": 10 },
+      "failure": { "nothing": true }
+    },
+    {
+      "name": "Nido de alimañas",
+      "type": "Combate",
+      "description": "Has perturbado una colonia agresiva.",
+      "options": [
+        { "stat": "DEX", "value": 25, "action": "Escapar" },
+        { "stat": "STR", "value": 20, "action": "Aplastarlas" }
+      ],
+      "success": { "items": ["Glándula extraña"], "gold": 10 },
+      "failure": { "hp": -20 }
+    },
+    {
+      "name": "Herrero cansado",
+      "type": "Encuentro",
+      "description": "Un herrero agotado pide ayuda para mover materiales.",
+      "options": [
+        { "stat": "STR", "value": 20, "action": "Ayudarlo" },
+        { "stat": "CHAR", "value": 20, "action": "Motivarlo" }
+      ],
+      "success": { "items": ["Daga reforjada (+2STR)"], "equipment": 1 },
+      "failure": { "hp": -10 }
+    },
+    {
+      "name": "Bandada de cuervos",
+      "type": "Encuentro",
+      "description": "Los cuervos te rodean como si custodiaran algo.",
+      "options": [
+        { "stat": "CHAR", "value": 25, "action": "Calmarlos" },
+        { "stat": "DEX", "value": 20, "action": "Correr entre ellos" }
+      ],
+      "success": { "gold": 20, "items": ["Pluma negra (+2CHAR)"] },
+      "failure": { "hp": -10, "char": -1 }
+    },
+    {
+      "name": "Taberna clandestina",
+      "type": "Social",
+      "options": [
+        { "stat": "CHAR", "value": 20, "action": "Socializar" },
+        { "stat": "DEX", "value": 20, "action": "Hacer trampas en los juegos" },
+        { "stat": "STR", "value": 25, "action": "Imponerte" }
+      ],
+      "success": {
+        "random": [
+          { "gold": 30 },
+          { "items": ["Capa de apostador (+4CHAR)"] },
+          { "skillPoints": 2 }
+        ]
+      },
+      "failure": { "gold": -15, "hp": -10 }
+    },
+    {
+      "name": "Estatua viviente",
+      "type": "Jefe",
+      "description": "Una estatua se mueve cuando no la miras.",
+      "options": [
+        { "stat": "DEX", "value": 30, "action": "Evitar su ataque" },
+        { "stat": "STR", "value": 30, "action": "Romperla" },
+        { "stat": "CHAR", "value": 35, "action": "Apaciguar al espíritu" }
+      ],
+      "success": { "items": ["Fragmento sagrado"], "skillPoints": 3 },
+      "failure": { "hp": -25 }
+    },
+    {
+      "name": "Huérfano carterista",
+      "type": "Encuentro",
+      "description": "Un niño intenta robarte la bolsa y luego te mira con miedo.",
+      "options": [
+        { "stat": "DEX", "value": 15, "action": "Atraparlo" },
+        { "stat": "CHAR", "value": 20, "action": "Perdonarlo" }
+      ],
+      "success": {
+        "random": [
+          { "gold": 10, "char": 2 },
+          { "items": ["Mapa robado"] }
+        ]
+      },
+      "failure": { "gold": -15 }
+    },
+    {
+      "name": "Santuario olvidado",
+      "type": "Santuario",
+      "options": [
+        { "stat": "CHAR", "value": 25, "action": "Rezar" },
+        { "stat": "DEX", "value": 20, "action": "Buscar compartimentos ocultos" }
+      ],
+      "success": { "hp": 20, "skillPoints": 2 },
+      "failure": { "hp": -15 }
+    },
+    {
+      "name": "Círculo de hongos",
+      "type": "Objeto misterioso",
+      "description": "Un extraño anillo de hongos crece en medio del bosque.",
+      "options": [
+        { "stat": "CHAR", "value": 20, "action": "Entrar con respeto" },
+        { "stat": "DEX", "value": 20, "action": "Recolectarlos" }
+      ],
+      "success": {
+        "random": [
+          { "hp": 15 },
+          { "dex": 3 },
+          { "char": 3 }
+        ]
+      },
+      "failure": { "hp": -15, "char": -1 }
+    },
+    {
+      "name": "Torneo local",
+      "type": "Jefe",
+      "options": [
+        { "stat": "STR", "value": 30, "action": "Competir en fuerza" },
+        { "stat": "DEX", "value": 30, "action": "Competir en agilidad" },
+        { "stat": "CHAR", "value": 30, "action": "Ganar al público" }
+      ],
+      "success": { "gold": 40, "skillPoints": 4, "equipment": 1 },
+      "failure": { "hp": -20, "char": -2 }
+    },
+    {
+      "name": "Cadáver del explorador",
+      "type": "Exploración",
+      "description": "Encuentras el cuerpo de un aventurero con un mapa en la mano.",
+      "options": [
+        { "stat": "DEX", "value": 20, "action": "Revisarlo rápido" },
+        { "stat": "CHAR", "value": 20, "action": "Dar sepultura primero" },
+        { "stat": "STR", "value": 20, "action": "Mover una roca cercana" }
+      ],
+      "success": { "items": ["Mapa del tesoro"], "gold": 10 },
+      "failure": { "hp": -10, "loseEquipment": 1 }
+    },
+    {
+      "name": "Duelo contra el chiqui tapia",
+      "type": "Jefe",
+      "description": "Entras accidentalmente a la bombonera y te cruzas con el despiadado, maquiavélico y temible Chiqui Tapia, el cual celoso de tu altura se enfurece y arremete contra ti.",
+      "options": [
+        { "stat": "DEX", "value": 45, "action": "Derrotarlo" },
+        { "stat": "CHAR", "value": 20, "action": "Confundirlo con palabras" },
+        { "stat": "STR", "value": 20, "action": "Enfrentarlo cuerpo a cuerpo" }
+      ],
+      "success": { "items": ["Mapa del tesoro"], "gold": 10 },
+      "failure": { "hp": -10, "loseEquipment": 1 }
+    }
+  ]
+}
