@@ -1561,6 +1561,8 @@ class HexGame {
         const requirementsPanel = document.getElementById('eventRequirements');
         if (requirementsPanel) requirementsPanel.classList.add('hidden');
         
+        // Reset event state to allow movement again
+        this.isEventPending = false;
         this.currentEvent = null;
         this.currentEventData = null;
         this.currentGoblinStats = null;
@@ -1614,6 +1616,9 @@ class HexGame {
             // Fallback
             console.log('⛪ A sacred place offers you rest and blessing.');
             this.showSanctuaryNotification('⛪ A sacred place offers you rest and blessing.');
+        } finally {
+            // Reset event state to allow movement again
+            this.isEventPending = false;
         }
     }
 
