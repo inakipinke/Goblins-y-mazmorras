@@ -1,5 +1,7 @@
 from contextlib import asynccontextmanager
 
+from typing import Literal
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, model_validator
 
@@ -8,6 +10,7 @@ from app.db import (
     NotFoundError,
     add_loot,
     apply_damage,
+    assign_base_stat_points,
     consume_event,
     equip_item,
     get_db_path,
@@ -77,6 +80,11 @@ class LootPayload(BaseModel):
 
 
 class DamagePayload(BaseModel):
+    cantidad: int = Field(ge=1)
+
+
+class AssignStatPayload(BaseModel):
+    stat: Literal["vida", "fuerza", "carisma", "destreza"]
     cantidad: int = Field(ge=1)
 
 
@@ -251,6 +259,14 @@ def consume_item(payload: ItemReferencePayload) -> dict[str, object]:
 def receive_damage(payload: DamagePayload) -> dict[str, object]:
     try:
         return apply_damage(payload.cantidad)
+    except Exception as error:
+        raise _translate_error(error) from error
+
+
+@app.post("/goblin/stats/asignar")
+def assign_stat_points(payload: AssignStatPayload) -> dict[str, object]:
+    try:
+        return assign_base_stat_points(stat=payload.stat, cantidad=payload.cantidad)
     except Exception as error:
         raise _translate_error(error) from error
 

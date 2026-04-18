@@ -970,6 +970,54 @@ def apply_damage(cantidad: int) -> dict[str, Any]:
     return response
 
 
+def assign_base_stat_points(stat: str, cantidad: int) -> dict[str, Any]:
+    if cantidad <= 0:
+        raise ConflictError("La cantidad de puntos debe ser mayor a cero.")
+
+    stat_columns = {
+        "vida": "vida_max",
+        "fuerza": "fuerza_base",
+        "carisma": "carisma_base",
+        "destreza": "destreza_base",
+    }
+    target_column = stat_columns.get(stat)
+    if target_column is None:
+        raise ConflictError(f"El stat '{stat}' no es asignable.")
+
+    with get_connection() as connection:
+        goblin = _get_active_goblin(connection)
+        if goblin is None:
+            raise NotFoundError("No hay una run activa. Crea una con POST /run/nueva.")
+
+        if stat == "vida":
+            connection.execute(
+                """
+                UPDATE goblin
+                SET vida_max = vida_max + ?,
+                    vida_actual = vida_actual + ?
+                WHERE id = ?
+                """,
+                (cantidad, cantidad, goblin["id"]),
+            )
+        else:
+            connection.execute(
+                f"""
+                UPDATE goblin
+                SET {target_column} = {target_column} + ?
+                WHERE id = ?
+                """,
+                (cantidad, goblin["id"]),
+            )
+        connection.commit()
+
+    return {
+        "message": "Stats base actualizados correctamente.",
+        "stat": stat,
+        "cantidad": cantidad,
+        "goblin": get_goblin_snapshot(),
+    }
+
+
 def mark_defeat() -> dict[str, Any]:
     with get_connection() as connection:
         goblin = _get_active_goblin(connection)
